@@ -1,0 +1,13 @@
+# Site navigation links
+
+- title: About me
+  url: /about/
+
+- title: Projects and Portfolio
+  url: /projects/
+
+- title: Blog
+  url: /blog/
+
+- title: Github
+  url: http://github.com/LCHansson

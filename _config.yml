@@ -1,0 +1,55 @@
+# Site wide configuration
+
+title: Being LCHansson
+locale: sv_SE
+description: Love Hansson
+logo: LH_p5.jpg
+search: true
+url: "http://lchansson.com"
+
+
+# Jekyll configuration
+
+permalink:   /:categories/:title/
+markdown:    kramdown
+highlighter: pygments
+sass:
+  sass_dir: _sass
+  style: compressed
+gems:
+  - jekyll-sitemap
+
+kramdown:
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  use_coderay: false
+
+
+# Site owner
+owner:
+  name: Love Hansson
+  avatar: lchansson.jpg
+  bio: "Analyst. Stats junkie. Amateur hacker."
+  email: love.hansson@gmail.com
+  disqus-shortname:
+  twitter: LCHansson
+  facebook: love.hansson
+  github: LCHansson
+  stackexchange: https://stackexchange.com/users/3419509/love-hansson
+  linkedin: lovehansson
+  instagram: #prenumerant
+  flickr: #username
+  tumblr: #username
+  google:
+    plus: #username
+    analytics:
+    verify:
+    ad-client:
+    ad-slot: 
+  bing-verify:
+
+
+include: [".htaccess"]
+exclude: ["lib", "config.rb", "Capfile", "config", "log", "Rakefile", "Rakefile.rb", "tmp", "less", "*.sublime-project", "*.sublime-workspace", "test", "spec", "Gruntfile.js", "package.json", "node_modules", "Gemfile", "Gemfile.lock", "LICENSE", "README.md"]

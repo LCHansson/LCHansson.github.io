@@ -1,0 +1,16 @@
+{
+    "contents" : "// TYPOGRAPHY ================================================\n$doc-font-size: 16;\n$doc-line-height: 26;\n$paragraph-indent: true !default;\n$base-font: 'PT Serif', serif;\n$heading-font: 'PT Sans Narrow', sans-serif;\n$code-font: Monaco, \"Courier New\", \"DejaVu Sans Mono\", \"Bitstream Vera Sans Mono\", monospace;\n$alt-font: $base-font;\n\n// COLOR ======================================================\n$bodycolor      : #fff;\n$body-color     : $bodycolor;\n$textcolor      : #333332;\n$text-color     : $textcolor;\n$border-color   : $text-color;\n$basecolor \t\t  : #343434;\t  \n$compcolor \t\t  : spin($basecolor, 180); \n$bordercolor    : $basecolor;\n$white          : #fff;\n$black          : #111;\n$accentcolor    : $black;\n\n// Buttons\n$primary\t\t\t: $black;\n$success\t\t\t: #5cb85c;\n$warning\t\t\t: #dd8338;\n$danger\t\t\t\t: #C64537;\n$info\t\t\t\t  : #308cbc;\n\n// Links\n$linkcolor \t\t    : #343434;\n$link-color       : $linkcolor;\n$linkcolorhover \t: darken($linkcolor, 10);\n$linkcolorvisited : lighten($linkcolorhover, 20);\n$linkcolorfocus \t: darken($linkcolorvisited, 10);\n\n// Media Queries\n$micro            : \"only screen and (min-width: 30em)\";\n$small            : \"only screen and (min-width: 37.5em)\";\n$medium           : \"only screen and (min-width: 48em)\";\n$large            : \"only screen and (min-width: 62em)\";\n$x-large          : \"only screen and (min-width: 86.375em)\";",
+    "created" : 1414362411529.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4202281417",
+    "id" : "CDE6D09",
+    "lastKnownWriteTime" : 1414358221,
+    "path" : "~/dev/LCHansson.github.io/_sass/variables.scss",
+    "project_path" : "_sass/variables.scss",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "text"
+}
