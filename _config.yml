@@ -2,9 +2,10 @@
 
 title: Being LCHansson
 locale: sv_SE
-description: Love Hansson
+description: Love Hansson. Analyst, stats junkie, amateur hacker.
 logo: LH_p5.jpg
 search: true
+#url: "http://localhost:4000"
 url: "http://lchansson.com"
 
 
