@@ -5,7 +5,7 @@ locale: sv_SE
 description: Love Hansson. Analyst, stats junkie, amateur hacker.
 logo: LH_p5.jpg
 search: true
-url: "http://lchansson.com"
+#url: http://lchansson.com
 
 
 # Jekyll configuration
