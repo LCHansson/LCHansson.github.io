@@ -1,7 +1,7 @@
 ---
 layout: home
 excerpt: "I'm LCHansson. Im all about understanding the world in new ways."
-author: lchansson
+author: LCHansson
 tags: [Jekyll, theme, responsive, blog, template]
 image:
   feature: ball.jpg

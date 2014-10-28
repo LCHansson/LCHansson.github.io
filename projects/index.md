@@ -1,7 +1,6 @@
 ---
 layout: page
-title: Projects and Portfolio
-author: lchansson
+author: LCHansson
 modified: 2014-10-26
 excerpt: "Selected works"
 ---
