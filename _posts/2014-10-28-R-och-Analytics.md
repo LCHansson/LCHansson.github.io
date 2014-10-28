@@ -2,6 +2,8 @@
 title: 'R och Analytics: Några framtidsspaningar'
 date: '2014-10-28'
 author: LCHansson
+image:
+  thumb: PM_logo.png
 output:
   ioslides_presentation:
     fig_caption: yes
