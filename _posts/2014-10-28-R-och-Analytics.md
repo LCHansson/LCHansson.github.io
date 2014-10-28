@@ -1,8 +1,9 @@
 ---
 title: 'R och Analytics: Några framtidsspaningar'
-author: "Love Hansson"
+author: "LCHansson"
 date: 2014-10-28
-output: ioslides_presentation
+tags: [sample post, readability, test]
+comments: true
 ---
 
 ## R Markdown
