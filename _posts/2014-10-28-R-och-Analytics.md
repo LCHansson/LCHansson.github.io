@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'R och Analytics: Några framtidsspaningar'
 author: "LCHansson"
 date: 2014-10-28
