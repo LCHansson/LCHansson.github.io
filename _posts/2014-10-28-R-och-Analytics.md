@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'R och Analytics: Några framtidsspaningar'
-author: "LCHansson"
+author: LCHansson
 date: 2014-10-28
 tags: [sample post, readability, test]
 comments: true
@@ -16,16 +16,9 @@ output:
     smaller: true
 ---
 
+Detta är råmanus till en föreläsning jag höll på Pensionsmyndigheten 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd).
+
 # Trender
-
-## Big Data
-
-Fler alternativ allt lättare tillgängliga.
-
-- Julia
-- Revolution R Open
-- Spark (ersätter Hadoop)
-
 
 ## Databearbetning
 
@@ -62,19 +55,31 @@ WYSIWYG-verktyg och closed source tappar mark som plattformar för dataanalys. S
 
 ## Open data
 
+Öppna data ökar starkt i tillgänglighet. Flera vägar finns för att samla in data från öppna datakällor, t.ex. flera R-paket.
 
-- modellering: det stora utvecklingsområdet. tredje generationens ML; automatisering; ickeparametrisk statistik
-- öppna data, ökad tillgång på intressanta data. ROpenSci, kaggle, etc.
+- `pxweb` (SCB, m.fl. myndigheter)
+- `ROpenSci`
+- `Quandl`
+- och många, många mer...
 
 
-##Verktygen
+## Big Data
+
+Fler alternativ allt mer tillgängliga och lättanvända.
+
+- Julia
+- Revolution R Open
+- Spark (ersätter Hadoop)
+
+
+## Verktygen
 
 Statistisk programmering genomgår just nu en stor utveckling. Dessa är någa exempel på områden där helt nya tekniker utvecklats under de senaste 1-2 åren:
 
 - Visualisering: `shiny`
 - Big data: The Julia language
 - Modellering: `caret`
-- Databearbetning: "Hadleyverse"-paketen: `dp,yr`, `ggvis`, `tidyr`
+- Databearbetning: "Hadleyverse"-paketen `dplyr`, `ggvis`, `tidyr`
 
 
 # Framtidsspaningar
