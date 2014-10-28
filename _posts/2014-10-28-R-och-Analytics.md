@@ -5,6 +5,7 @@ author: "LCHansson"
 date: 2014-10-28
 tags: [sample post, readability, test]
 comments: true
+output: ioslides_presentation
 ---
 
 ## R Markdown
