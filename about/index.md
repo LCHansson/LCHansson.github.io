@@ -18,8 +18,20 @@ I use a lot of tools, but two that stand out particularly are the [R language][R
 
 I'm always open to new interesting projects and opportunities. If you want to work with me on a project, feel free to [drop me a line][Email]!
 
+### CV
+
+If you're interested inmy contributions to the open source community, see my [Open Source Report Card][OSScv] over at dfm.io.
+
+For a slightly more serious approach, [here's my LinkedIn][LinkedIn] page.
+
+If you're really interested in all the gory details (why on Earth would you be that?), you can of course download a PDF with my full resume (currently only in Swedish) [here][CVdl].
+
+
 
 [PMy]: https://secure.pensionsmyndigheten.se
 [Rlang]: http://www.r-project.org
 [D3]: http://d3js.org/
 [Email]: mailto:love.hansson@gmail.com
+[OSScv]: https://osrc.dfm.io/lchansson/
+[LinkedIn]: http://linkedin.com/in/lovehansson
+[CVdl]: https://dl.dropboxusercontent.com/u/18122393/CV_Love_Hansson_sv.pdf
