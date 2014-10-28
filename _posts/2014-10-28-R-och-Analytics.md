@@ -1,22 +1,29 @@
 ---
-layout: post
 title: 'R och Analytics: Några framtidsspaningar'
-author: LCHansson
-date: 2014-10-28
-tags: [sample post, readability, test]
-comments: true
+author: "LCHansson"
+date: '2014-10-28'
 output:
   ioslides_presentation:
-    incremental: true
-    logo: figs/PM_logo.png
-    fig_width: 6
+    fig_caption: yes
     fig_height: 4
-    fig_caption: true
-    widescreen: true
-    smaller: true
+    fig_width: 6
+    incremental: yes
+    logo: images/PM_logo.png
+    smaller: yes
+    widescreen: yes
+  beamer_presentation:
+    incremental: yes
+  slidy_presentation:
+    incremental: yes
+layout: post
+tags:
+- sample post
+- readability
+- test
+comments: yes
 ---
 
-Detta är råmanus till en föreläsning jag höll på Pensionsmyndigheten 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd).
+Detta är råmanus till en dragning jag höll på Pensionsmyndigheten i oktober 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd) och en HTML-variant finns [här]()
 
 # Trender
 
@@ -43,7 +50,7 @@ Det stora utvecklingsområdet de kommande åren. Metoder för både enkel och av
 
 `caret` är ett paket för att mcyket snabbt preparera data för modellering och mycket snabbt tillämpa en enorm uppsättning analysmetoder (t.ex. GLM, Random Forest, neurala nätverk, etc.). Resultaten är direkt jämförbara, även om de underliggande modellerna är extremt olika. __Detta arbetssätt är utan tvekan framtiden för analytiskt arbete__!
 
-![http://caret.r-forge.r-project.org/](figs/caret.jpg)
+![http://caret.r-forge.r-project.org/](images/caret.jpg)
 
 
 ## Publicering
@@ -55,7 +62,7 @@ WYSIWYG-verktyg och closed source tappar mark som plattformar för dataanalys. S
 
 ## Open data
 
-Öppna data ökar starkt i tillgänglighet. Flera vägar finns för att samla in data från öppna datakällor, t.ex. flera R-paket.
+Open data ökar starkt i tillgänglighet. Flera vägar finns för att samla in data från öppna datakällor, t.ex. flera R-paket.
 
 - `pxweb` (SCB, m.fl. myndigheter)
 - `ROpenSci`
