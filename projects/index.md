@@ -19,15 +19,15 @@ excerpt: "Selected works"
 
 ### Braceana
 
-Braceana is a small, easy-to-use CMS for R-flavored markdown. It includes support for interactive graphics through [Shiny][shiny] based apps. [[Source][braceana-gh]; [live demo][braceana-demo]]
+Braceana is a small, easy-to-use CMS for R-flavored markdown. It includes support for interactive graphics through [Shiny][shiny] based apps. <br/>[[source][braceana-gh]; [live demo][braceana-demo]]
 
 ### Stockholm R User Group
 
-I'm a co-founder, former board member, and active participant of [SRUG][srug]. [[talk][srugtalks]]
+I'm a co-founder, former board member, and active participant of [SRUG][srug]. <br/>[[talk][srugtalks]]
 
 ### DataLove
 
-Data analysis is in dire need of automation. An incredible amount of time and effort are spent on doing basic analytical tasks like metadata generation, explorative analysis, and other tasks related to *understanding your data*. DataLove is an attempt to create an R library to streamline parts of this process. Still in its early stages of development, the goal is to develop a full toolkit for automation of basic data analysis. [[Source][datalove-gh]; [inspiration][automation-video]]
+Data analysis is in dire need of automation. An incredible amount of time and effort are spent on doing basic analytical tasks like metadata generation, explorative analysis, and other tasks related to *understanding your data*. DataLove is an attempt to create an R library to streamline parts of this process. Still in its early stages of development, the goal is to develop a full toolkit for automation of basic data analysis. <br/>[[source][datalove-gh]; [inspiration][automation-video]]
 
 ---
 
@@ -35,7 +35,7 @@ Data analysis is in dire need of automation. An incredible amount of time and ef
 
 ### Kvartersregeringen / Hack for Sweden
 
-Together with friends @jensfinnas and @hisekaldma I won the Best Data Visualization award at [Hack for Sweden 2014][hfs14] with an app named Kvartersregeringen. The app simulated a government election based on what voters in your own constituency would have elected. [[media 1][hfspress1]; [media 2][hfspress2]]
+Together with friends [@jensfinnas](http://twitter.com/jensfinnas) and [@hisekaldma](http://twitter.com/hisekaldma) I won the Best Data Visualization award at [Hack for Sweden 2014][hfs14] with an app named Kvartersregeringen. The app simulated a government election based on what voters in your own constituency would have elected. <br/>[[media 1][hfspress1]; [media 2][hfspress2]]
 
 
 [shiny]: http://shiny.rstudio.com
