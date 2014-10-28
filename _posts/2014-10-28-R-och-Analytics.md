@@ -1,6 +1,5 @@
 ---
 title: 'R och Analytics: Några framtidsspaningar'
-author: "LCHansson"
 date: '2014-10-28'
 output:
   ioslides_presentation:
@@ -23,7 +22,7 @@ tags:
 comments: yes
 ---
 
-Detta är råmanus till en dragning jag höll på Pensionsmyndigheten i oktober 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd) och en HTML-variant finns [här]()
+Detta är råmanus till en dragning jag höll på Pensionsmyndigheten i oktober 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd) och en HTML-variant finns [här]({{site.url}}/assets/html/2014-10-28-R-och-Analytics.html)
 
 # Trender
 
@@ -118,3 +117,6 @@ De och Julia-teamet står uppskattningsvis för 80-90% av den uppmärksamhet som
 
 
 # Tack!
+
+http://lchansson.com/R-och-Analytics/
+love.hansson@gmail.com
