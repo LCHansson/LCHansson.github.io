@@ -1,5 +1,6 @@
 ---
 layout: page
+title: 'Current Projects'
 author: LCHansson
 modified: 2014-10-26
 excerpt: "Selected works"
@@ -15,7 +16,6 @@ excerpt: "Selected works"
 </div>
 </section><!-- /#table-of-contents -->
 
-## Current Projects
 
 ### Braceana
 
@@ -31,7 +31,7 @@ Data analysis is in dire need of automation. An incredible amount of time and ef
 
 ---
 
-## Past Works
+# Past Works
 
 ### Kvartersregeringen / Hack for Sweden
 
