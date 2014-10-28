@@ -1,6 +1,7 @@
 ---
 title: 'R och Analytics: Några framtidsspaningar'
 date: '2014-10-28'
+author: LCHansson
 output:
   ioslides_presentation:
     fig_caption: yes
@@ -15,10 +16,7 @@ output:
   slidy_presentation:
     incremental: yes
 layout: post
-tags:
-- sample post
-- readability
-- test
+tags: [R, analytics]
 comments: yes
 ---
 
