@@ -1,7 +1,6 @@
 ---
 title: 'R och Analytics: Några framtidsspaningar'
 date: '2014-10-28'
-author: LCHansson
 output:
   ioslides_presentation:
     fig_caption: yes
@@ -50,7 +49,7 @@ Det stora utvecklingsområdet de kommande åren. Metoder för både enkel och av
 
 `caret` är ett paket för att mcyket snabbt preparera data för modellering och mycket snabbt tillämpa en enorm uppsättning analysmetoder (t.ex. GLM, Random Forest, neurala nätverk, etc.). Resultaten är direkt jämförbara, även om de underliggande modellerna är extremt olika. __Detta arbetssätt är utan tvekan framtiden för analytiskt arbete__!
 
-![http://caret.r-forge.r-project.org/](images/caret.jpg)
+![http://caret.r-forge.r-project.org/](../images/caret.jpg)
 
 
 ## Publicering
