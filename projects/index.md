@@ -30,6 +30,7 @@ I'm a co-founder, former board member, and active participant of [SRUG][srug]. <
 Data analysis is in dire need of automation. An incredible amount of time and effort are spent on doing basic analytical tasks like metadata generation, explorative analysis, and other tasks related to *understanding your data*. DataLove is an attempt to create an R library to streamline parts of this process. Still in its early stages of development, the goal is to develop a full toolkit for automation of basic data analysis. <br/>[[source][datalove-gh]; [inspiration][automation-video]]
 
 ---
+<br/>
 
 # Past Works
 
