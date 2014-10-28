@@ -22,7 +22,7 @@ I'm always open to new interesting projects and opportunities. If you want to wo
 
 If you're interested inmy contributions to the open source community, see my [Open Source Report Card][OSScv] over at dfm.io.
 
-For a slightly more serious approach, [here's my LinkedIn][LinkedIn] page.
+For a slightly more serious approach, see my [LinkedIn page][LinkedIn].
 
 If you're really interested in all the gory details (why on Earth would you be that?), you can of course download a PDF with my full resume (currently only in Swedish) [here][CVdl].
 
