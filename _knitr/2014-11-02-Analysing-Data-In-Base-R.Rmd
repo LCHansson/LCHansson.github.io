@@ -1,0 +1,161 @@
+---
+title: 'Examining Data in Base R'
+date: '2014-11-02'
+author: LCHansson
+layout: post
+tags: [R, analytics, basics]
+comments: yes
+---
+
+This is the first in a series of posts about using basic tools for data analysis in R. I've put it together as much for my own pleasure as for anyone else to read. If you read this and like it, don't hesitate to give me a thumbs up in the comments below!
+
+_All the source code can be found in a separate Github repository here: [LCHansson/rTutorials](https://github.com/LCHansson/rTutorials). If you think anything in the code should be improved, please consider making a pull request to that repository and I will update this page accordingly._
+
+
+<section id="table-of-contents" class="toc">
+  <header>
+    <h3>Overview</h3>
+  </header>
+<div id="drawer" markdown="1">
+*  Auto generated table of contents
+{:toc}
+</div>
+</section><!-- /#table-of-contents -->
+
+
+Usually, any analyst will want to start her endeavour by diving into data. When I was still at the beginning of my data analysis career I used to believe that the best way of looking at data is by passing it to `View()` or something similar, to be able to inspect data the Excel way.
+
+However, I quickly realised that this method is often highly subpar when it comes to gaining any insights into data, and might in many cases actually even give you a false picture of what data _actually_ looks like. Instead I have found that there are a multitude of ways of describing data that presents a more accurate view of the data at hand, and quickly presents you with a couple of crucial pieces of metadata.
+
+
+## Inspection
+
+The first commands any analyst will want to learn are used for _inspecting_ data. Here, I have found `str()` and `head()/tail()` particularly good. Below you'll see them used on three built-in R datasets.
+
+```{r}
+str(iris)
+```
+
+```{r}
+head(airquality)
+```
+
+```{r}
+tail(cars, n = 3)
+```
+
+## Summarization
+
+The next step is usually to carry out some kind of summarization of variables contained within your data. The `summary()` command is usually excellent at taking first steps for this. It can beused to describe vectors...
+
+```{r}
+summary(letters) # This is a character() vector
+```
+
+...of different kinds...
+```{r}
+summary(iris$Species) # a factor() vector
+```
+
+...displaying information relevant to the data at hand.
+```{r}
+summary(iris$Sepal.Length) # a numeric() vector
+```
+
+It can, of course, also be used to describe tabular data. This is, naturally, the most common use case.
+```{r}
+summary(iris)
+```
+
+
+## Aggregation
+
+Many insights can be gained from aggregation of data. Especially when dealing with data that comprises both categorical variables and measurement variables the analyst can often learn much from aggregating data in different fashions. Unsurprisingly, `aggregate()` is the function you'll need most of the time. It makes extensive use of R's `formula()` interface (the `~` symbol). This is a slightly more complex way of looking at data, but can be a very efficient tool to gain slightly more complex insights on any significant in-data differences and which variables are potential predictors and which might be outcomes.
+
+```{r}
+aggregate(. ~ Species, data = iris, FUN = mean)
+```
+
+`aggregate()` takes a FUN argument which is the function applied to the groups formed in data. This can be any function, even a user defined one.
+
+```{r}
+aggregate(. ~ Species, data = iris, FUN = sum)
+```
+
+Another useful tool is the `table()` function which is used to create frequency tables, and its nephew `prop.table()`, used to create relative frequency tables.
+
+```{r}
+table(Nile)
+```
+
+`table()` can be used on any kind of tabular data. Note: DO NOT pass an entire data frame with many variables to `table()` since this will cause it to tabulate all possible combinations of variables in the data set. If you really want to try it to obtain a better understanding of how `table()` works, make sure to try it on a really small dataset, like `table(cars)`.
+
+```{r}
+table(iris[,c("Species", "Petal.Width")])
+```
+
+It can also be combined with the `with()` function to create local measurement variables and categories.
+```{r}
+with(iris, table(Species, Large.Petals = Petal.Width > 1.5))
+```
+
+`table()` returns an object that can be used as input in other functions, like `prop.table()` to return a list of proportions.
+
+```{r}
+myTable <- with(iris, table(Species, Large.Petals = Petal.Width > 1.5))
+prop.table(myTable)
+```
+
+If we want frequencies to sum up only row or column wise, we can pass a 1 (for rows) or 2 (columns) as an additional argument to prop.table()
+
+```{r}
+prop.table(myTable, 1) # Rowwise relative frequencies
+prop.table(myTable, 2) # Column-wise relative frequencies
+```
+
+## Handling missing values
+
+Sometimes (a lot of times) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
+
+```{r}
+summary(airquality$Solar.R)
+```
+
+We can locate the positions of NA values using `which()`...
+```{r}
+which(is.na(airquality$Solar.R))
+```
+
+...and print the values using the vector returned by `which()` as an input
+```{r}
+airquality[which(is.na(airquality$Solar.R)),]
+```
+
+Missing values can be handled in several ways. We can remove them from a vector...
+```{r}
+myVec <- airquality$Solar.R
+length(myVec) # The length before removal of NA values
+myVec <- myVec[!is.na(myVec)]
+length(myVec) # The post-removal length
+```
+
+...or from a data frame...
+```{r}
+myDF <- airquality
+dim(myDF) # Dimensions of the data.frame() before removal of rows containing NA values
+myDF <- myDF[!is.na(airquality$Solar.R),]
+dim(myDF) # Post-removal dimensions. Note that there are now fewer rows.
+```
+
+More importantly, we can also impute missing values using `impute()` from the `Hmisc` package.
+```{r}
+myDF <- airquality
+suppressMessages(require(Hmisc))
+myDF$Solar.R <- impute(myDF$Solar.R, fun = median)
+```
+
+## Moving on
+
+This article displays a subset of the tools I find myself using recurrently to inspect and analyse data. The last thing you saw in the article was how to _impute_ missing values, which is actually not about _learning_ about data but _modifying_ it, a thing that is often called Feature Engineering. This will be the topic of further posts in the future.
+
+Seasoned R programmers might also object that many packages, like `Hmisc`, `psych`, `dplyr`, `data.table`, `stats`, and many others have functions for data inspection that are vastly superior to base-R functionality. I tend to agree on this, but I thought it'd be nice to provide R beginners (as well as myself) with a basic set of tools that one can easily learn without having to familiarize yourself with the API of any particular package (as any users of dplyr or data.table will tell you, the differences in how data is handled can vary substantially between packages!). I hope this has been of some help to you if you made it this far into the article. Any feedback is more than welcome!
