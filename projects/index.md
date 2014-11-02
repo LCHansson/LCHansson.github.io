@@ -39,6 +39,14 @@ Data analysis is in dire need of automation. An incredible amount of time and ef
 Together with friends [@jensfinnas](http://twitter.com/jensfinnas) and [@hisekaldma](http://twitter.com/hisekaldma) I won the Best Data Visualization award at [Hack for Sweden 2014][hfs14] with an app named Kvartersregeringen. The app simulated a government election based on what voters in your own constituency would have elected. <br/>[[media 1][hfspress1]; [media 2][hfspress2]]
 
 
+### iPlot
+
+iPlot is (or perhaps rather, _was_) a R/Shiny based, interactive, browser-based application for visual inspection of data that I developed wtogether with colleague [@reinholdsson](https://github.com/reinholdsson). It was never developed any further than into the prototype stage, but is a working showcase example of how Shiny can be used for quick-and-dirty prototyping when developing analytics tools.
+
+iPlot was based on an old version of the Shiny API and has thus since stopped lookin as beautiful as we first intended it to, but it you're sincerely interested you can still find links to the code (including screenshots!) and a half-working demo below.
+<br/>[[source code][iPlot_source]; [example application][iPlot_example]]
+
+
 [shiny]: http://shiny.rstudio.com
 [braceana-gh]: https://github.com/LCHansson/braceana
 [braceana-demo]: https://lchansson.shinyapps.io/braceana
@@ -49,3 +57,5 @@ Together with friends [@jensfinnas](http://twitter.com/jensfinnas) and [@hisekal
 [hfs14]: http://hackforsweden.se/hack-for-sweden-2014/
 [hfspress1]: http://www.metro.se/nyheter/regeringen-om-ditt-kvarter-fick-bestamma/EVHnct!oQkSNqhVCyd2s/
 [hfspress2]: http://feber.se/webb/art/296151/kolla_in_hur_ditt_kvarter_rsta/
+[iPlot_source]: https://github.com/SwedishPensionsAgency/iPlot
+[iPlot_example]: http://glimmer.rstudio.com/reinholdsson/iplot/
