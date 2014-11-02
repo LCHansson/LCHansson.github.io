@@ -1,5 +1,5 @@
 ---
-title: 'Examining Data in Base R'
+title: 'Examining Data With Base R'
 date: '2014-11-02'
 author: LCHansson
 layout: post
@@ -115,7 +115,7 @@ prop.table(myTable, 2) # Column-wise relative frequencies
 
 ## Handling missing values
 
-Sometimes (a lot of times) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
+Sometimes (actually, most of the time) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
 
 ```{r}
 summary(airquality$Solar.R)
