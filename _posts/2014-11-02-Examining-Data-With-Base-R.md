@@ -23,14 +23,14 @@ _All the source code can be found in a separate Github repository here: [LCHanss
 </section><!-- /#table-of-contents -->
 
 
-Usually, any analyst will want to start her endeavour by diving into data. When I was still at the beginning of my data analysis career I used to believe that the best way of looking at data is by passing it to `View()` or something similar, to be able to inspect data the Excel way.
+Usually, any analyst will want to start her endeavour by diving into data. When I first started learning my way around R I used to believe that the best way of looking at data is by passing it to `View()` or something similar, to be able to inspect data the Excel way. After all, this is how most analysts usually look at data in software like SPSS, SAS, or most other commercial "statistical packages" out there.
 
-However, I quickly realised that this method is often highly subpar when it comes to gaining any insights into data, and might in many cases actually even give you a false picture of what data _actually_ looks like. Instead I have found that there are a multitude of ways of describing data that presents a more accurate view of the data at hand, and quickly presents you with a couple of crucial pieces of metadata.
+However, I quickly came to realise that this method is often highly subpar when it comes to gaining any insights into data, and might sometimes even give you a false picture of what data _actually_ looks like. Instead I have found that there are a multitude of ways of describing data that presents a more accurate view of the data at hand, and quickly presents you with a couple of crucial pieces of metadata.
 
 
 ## Inspection
 
-The first commands any analyst will want to learn are used for _inspecting_ data. Here, I have found `str()` and `head()/tail()` particularly good. Below you'll see them used on three built-in R datasets.
+The first commands any analyst will want to learn are used for simply _inspecting_ data. Here, I have found `str()` and `head()/tail()` particularly good. Below you'll see them used on three built-in R datasets.
 
 
 {% highlight r %}
@@ -121,7 +121,7 @@ summary(iris$Sepal.Length) # a numeric() vector
 >   4.300   5.100   5.800   5.843   6.400   7.900
 {% endhighlight %}
 
-It can, of course, also be used to describe tabular data. This is, naturally, the most common use case.
+´summary()` can, of course, also be used to describe tabular data.
 
 {% highlight r %}
 summary(iris)
@@ -206,7 +206,7 @@ table(Nile)
 >    1    3    1    1    2    1    1    1    1    1
 {% endhighlight %}
 
-`table()` can be used on any kind of tabular data. Note: DO NOT pass an entire data frame with many variables to `table()` since this will cause it to tabulate all possible combinations of variables in the data set. If you really want to try it to obtain a better understanding of how `table()` works, make sure to try it on a really small dataset, like `table(cars)`.
+This can be applied to any kind of tabular data. However be warned: DO NOT pass an entire data frame with many variables and/or rows) to `table()` since this will cause it to tabulate all possible combinations of variables in the data set. If you really want to try it to obtain a better understanding of how `table()` works, make sure to try it on a really small dataset, like `table(cars)`.
 
 
 {% highlight r %}
@@ -228,7 +228,7 @@ table(iris[,c("Species", "Petal.Width")])
 >   virginica    5  6   6   3   8   3   3
 {% endhighlight %}
 
-It can also be combined with the `with()` function to create local measurement variables and categories.
+`table()` can also be combined with the `with()` function to create local measurement variables and categories.
 
 {% highlight r %}
 with(iris, table(Species, Large.Petals = Petal.Width > 1.5))
@@ -244,8 +244,7 @@ with(iris, table(Species, Large.Petals = Petal.Width > 1.5))
 >   virginica      3   47
 {% endhighlight %}
 
-`table()` returns an object that can be used as input in other functions, like `prop.table()` to return a list of proportions.
-
+`table()` returns a table object that can be used as input in other functions, like `prop.table()` to return a list of proportions.
 
 {% highlight r %}
 myTable <- with(iris, table(Species, Large.Petals = Petal.Width > 1.5))
@@ -263,7 +262,6 @@ prop.table(myTable)
 {% endhighlight %}
 
 If we want frequencies to sum up only row or column wise, we can pass a 1 (for rows) or 2 (columns) as an additional argument to prop.table()
-
 
 {% highlight r %}
 prop.table(myTable, 1) # Rowwise relative frequencies
@@ -297,7 +295,7 @@ prop.table(myTable, 2) # Column-wise relative frequencies
 
 ## Handling missing values
 
-Sometimes (actually, most of the time) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
+Sometimes (well actually, most of the time when working with _real-world data_) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
 
 
 {% highlight r %}
@@ -404,6 +402,8 @@ myDF$Solar.R <- impute(myDF$Solar.R, fun = median)
 
 ## Moving on
 
-This article displays a subset of the tools I find myself using recurrently to inspect and analyse data. The last thing you saw in the article was how to _impute_ missing values, which is actually not about _learning_ about data but _modifying_ it, a thing that is often called Feature Engineering. This will be the topic of further posts in the future.
+This article introduces a subset of the tools I find myself using recurrently to inspect and analyse data. The last thing you saw in the article was how to _impute_ missing values, which is actually not about _learning_ about data but _modifying_ it, a thing that is often called Feature Engineering. This will be the topic of further posts in the future.
 
-Seasoned R programmers might also object that many packages, like `Hmisc`, `psych`, `dplyr`, `data.table`, `stats`, and many others have functions for data inspection that are vastly superior to base-R functionality. I tend to agree on this, but I thought it'd be nice to provide R beginners (as well as myself) with a basic set of tools that one can easily learn without having to familiarize yourself with the API of any particular package (as any users of dplyr or data.table will tell you, the differences in how data is handled can vary substantially between packages!). I hope this has been of some help to you if you made it this far into the article. Any feedback is more than welcome!
+Seasoned R programmers might also object that many packages, like `Hmisc`, `psych`, `dplyr`, `data.table`, `stats`, and many others have functions for data inspection that are vastly superior to base-R functionality. I tend to agree on this, but I thought it'd be nice to provide R beginners (as well as myself) with a basic set of tools that one can easily learn without having to familiarize yourself with the API of any particular package (as any users of dplyr or data.table will tell you, the differences in how data is handled can vary substantially between packages!). Also, I constantly find myself returning to the base-R functions for the occasions when there is a particular task that my favorite dplyr or Hmisc function doesn't handle as well as it should.
+
+I hope this has been of some help to you if you made it this far into the article. Any feedback is more than welcome!
