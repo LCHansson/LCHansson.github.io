@@ -2,8 +2,9 @@
 
 title: Being LCHansson
 locale: sv_SE
-url:
-  http://lchansson.com
+url: "http://localhost:4000"
+#url:
+#  http://lchansson.com
 
 # Jekyll configuration
 
@@ -30,7 +31,7 @@ owner:
   avatar: lchansson.jpg
   bio: "Analyst. Stats junkie. Amateur hacker."
   email: love.hansson@gmail.com
-  disqus-shortname: LCHansson
+  disqus-shortname: lchanssoncom
   twitter: LCHansson
   facebook: love.hansson
   github: LCHansson
