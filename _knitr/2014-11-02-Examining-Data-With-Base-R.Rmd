@@ -9,8 +9,6 @@ comments: yes
 
 This is the first in a series of posts about using basic tools for data analysis in R. I've put it together as much for my own pleasure as for anyone else to read. If you read this and like it, don't hesitate to give me a thumbs up in the comments below!
 
-_All the source code can be found in a separate Github repository here: [LCHansson/rTutorials](https://github.com/LCHansson/rTutorials). If you think anything in the code should be improved, please consider making a pull request to that repository and I will update this page accordingly._
-
 
 <section id="table-of-contents" class="toc">
   <header>
@@ -23,14 +21,16 @@ _All the source code can be found in a separate Github repository here: [LCHanss
 </section><!-- /#table-of-contents -->
 
 
-Usually, any analyst will want to start her endeavour by diving into data. When I first started learning my way around R I used to believe that the best way of looking at data is by passing it to `View()` or something similar, to be able to inspect data the Excel way. After all, this is how most analysts usually look at data in software like SPSS, SAS, or most other commercial "statistical packages" out there.
+Usually, any analyst will want to start her endeavour by diving into data. When I first started learning my way around R I used to believe that the best way of looking at data is by passing it to `View()` or something similar, to be able to inspect data the Excel way. After all, this is how many analysts usually look at data using software like SPSS, SAS, or most other commercial "statistical packages" out there.
 
-However, I quickly came to realise that this method is often highly subpar when it comes to gaining any insights into data, and might sometimes even give you a false picture of what data _actually_ looks like. Instead I have found that there are a multitude of ways of describing data that presents a more accurate view of the data at hand, and quickly presents you with a couple of crucial pieces of metadata.
+However, I quickly came to realise that this method is often highly subpar when it comes to gaining any deeper insights into data, and might sometimes even give you a false picture of what data _actually_ looks like. Instead I have found that there are a multitude of ways of describing data that presents a more accurate view of the data at hand, and quickly presents you with a couple of crucial pieces of metadata.
+
+In the sections below I describe four common techniques used for examining data; _Inspection_, _Summarization_, _Aggregation_, and _Handling of missing values_.
 
 
 ## Inspection
 
-The first commands any analyst will want to learn are used for simply _inspecting_ data. Here, I have found `str()` and `head()/tail()` particularly good. Below you'll see them used on three built-in R datasets.
+The first commands any analyst will want to learn are used for simply _inspecting_ data, i.e. just looking at it without any preprocessing. Here, I have found `str()` and `head()/tail()` particularly good. Below you'll see them used on three built-in R datasets.
 
 ```{r}
 str(iris)
@@ -44,9 +44,11 @@ head(airquality)
 tail(cars, n = 3)
 ```
 
+*To summarize:* `str()` and `head()/tail()` are useful commands for simply displaying parts of your data and some metadata about it.
+
 ## Summarization
 
-The next step is usually to carry out some kind of summarization of variables contained within your data. The `summary()` command is usually excellent at taking first steps for this. It can beused to describe vectors...
+The step following inspection usually consists of carrying out some kind of summarization of variables contained within your data. The `summary()` command is usually excellent at taking first steps for this. It can be used to describe vectors...
 
 ```{r}
 summary(letters) # This is a character() vector
@@ -62,11 +64,12 @@ summary(iris$Species) # a factor() vector
 summary(iris$Sepal.Length) # a numeric() vector
 ```
 
-´summary()` can, of course, also be used to describe tabular data.
+`summary()` can, of course, also be used to describe tabular data.
 ```{r}
 summary(iris)
 ```
 
+*To summarize (pun intended):* `summary()` is useful for describing your data in an automated way, providing you with more metadata than pure inspection will generate.
 
 ## Aggregation
 
@@ -111,6 +114,8 @@ prop.table(myTable, 1) # Rowwise relative frequencies
 prop.table(myTable, 2) # Column-wise relative frequencies
 ```
 
+*To summarize:* `aggregate()` and `table()` are methods used for categorizing data and understanding what values are more common and which are rare. `prop.table()` helps you put the output from `table()` in perspective. `with()` can be used to make`table()` compute new variables when creating frequency tables.
+
 ## Handling missing values
 
 Sometimes (well actually, most of the time when working with _real-world data_) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
@@ -152,10 +157,14 @@ suppressMessages(require(Hmisc))
 myDF$Solar.R <- impute(myDF$Solar.R, fun = median)
 ```
 
+*To summarize:* `is.na()` and `which()` are useful commands for locating missing values and displaying them in some context (using tabular data). `impute()` can be used to impute values in place of the missing values if needed.
+
 ## Moving on
 
 This article introduces a subset of the tools I find myself using recurrently to inspect and analyse data. The last thing you saw in the article was how to _impute_ missing values, which is actually not about _learning_ about data but _modifying_ it, a thing that is often called Feature Engineering. This will be the topic of further posts in the future.
 
 Seasoned R programmers might also object that many packages, like `Hmisc`, `psych`, `dplyr`, `data.table`, `stats`, and many others have functions for data inspection that are vastly superior to base-R functionality. I tend to agree on this, but I thought it'd be nice to provide R beginners (as well as myself) with a basic set of tools that one can easily learn without having to familiarize yourself with the API of any particular package (as any users of dplyr or data.table will tell you, the differences in how data is handled can vary substantially between packages!). Also, I constantly find myself returning to the base-R functions for the occasions when there is a particular task that my favorite dplyr or Hmisc function doesn't handle as well as it should.
+
+All the source code on display here can be found in a separate Github repository here: [LCHansson/rTutorials](https://github.com/LCHansson/rTutorials). If you think anything in the code should be improved, please consider making a pull request to that repository and I will update this page accordingly.
 
 I hope this has been of some help to you if you made it this far into the article. Any feedback is more than welcome!
