@@ -5,6 +5,7 @@ author: LCHansson
 layout: post
 tags: [R, analytics, basics]
 comments: yes
+lang: en
 ---
 
 This is the first in a series of posts about using basic tools for data analysis in R. I've put it together as much for my own pleasure as for anyone else to read. If you read this and like it, don't hesitate to give me a thumbs up in the comments below!
@@ -46,6 +47,7 @@ tail(cars, n = 3)
 
 *To summarize:* `str()` and `head()/tail()` are useful commands for simply displaying parts of your data and some metadata about it.
 
+
 ## Summarization
 
 The step following inspection usually consists of carrying out some kind of summarization of variables contained within your data. The `summary()` command is usually excellent at taking first steps for this. It can be used to describe vectors...
@@ -70,6 +72,7 @@ summary(iris)
 ```
 
 *To summarize (pun intended):* `summary()` is useful for describing your data in an automated way, providing you with more metadata than pure inspection will generate.
+
 
 ## Aggregation
 
@@ -115,6 +118,7 @@ prop.table(myTable, 2) # Column-wise relative frequencies
 ```
 
 *To summarize:* `aggregate()` and `table()` are methods used for categorizing data and understanding what values are more common and which are rare. `prop.table()` helps you put the output from `table()` in perspective. `with()` can be used to make`table()` compute new variables when creating frequency tables.
+
 
 ## Handling missing values
 

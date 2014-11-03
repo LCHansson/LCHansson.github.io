@@ -2,8 +2,6 @@
 title: 'R och Analytics: Några framtidsspaningar'
 date: '2014-10-28'
 author: LCHansson
-image:
-  thumb: PM_logo.png
 output:
   ioslides_presentation:
     fig_caption: yes
@@ -13,18 +11,13 @@ output:
     logo: images/PM_logo.png
     smaller: yes
     widescreen: yes
-  beamer_presentation:
-    incremental: yes
-  slidy_presentation:
-    incremental: yes
 layout: post
 tags: [R, analytics]
 comments: yes
+lang: se
 ---
 
-Detta är råmanus till en dragning jag höll på Pensionsmyndigheten i oktober 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd) och en HTML-variant finns [här]({{site.url}}/assets/html/2014-10-28-R-och-Analytics.html).
-
----
+Detta är råmanus till en dragning jag höll på Pensionsmyndigheten i oktober 2014. Originalet finns i Markdown-form [här](https://github.com/LCHansson/LCHansson.github.io/blob/master/_knitr/2014-10-28-R-och-Analytics.Rmd) och en HTML-variant finns [här]({{site.url}}/assets/html/2014-10-28-R-och-Analytics.html). Texten nedan är inte tänkt att läsas som löpande text utan är en sammanfattning i stolpform.
 
 ## Trender
 
@@ -116,9 +109,3 @@ De och Julia-teamet står uppskattningsvis för 80-90% av den uppmärksamhet som
 - Jens Finnäs: [Spaningar om framtiden för datajournalistik](http://jplusplus.se/14-spaningar-om-datajournalistik/)
 - Bob Muenchen: [Användningstrender för olika statistikmjukvaror](http://r4stats.com/articles/popularity/)
 - C.G.P. Grey: [Humans Need Not Apply (youtube)](https://www.youtube.com/watch?v=7Pq-S557XQU&list=UU2C_jShtL725hvbm1arSV9w)
-
-
-## Tack!
-
-http://lchansson.com/R-och-Analytics/
-love.hansson@gmail.com
