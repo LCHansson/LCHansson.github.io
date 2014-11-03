@@ -85,7 +85,7 @@ tail(cars, n = 3)
 
 ## Summarization
 
-The step following inspection usually consists of carrying out some kind of summarization of variables contained within your data. The `summary()` command is usually excellent at taking first steps for this. It can be used to describe vectors...
+The step following inspection usually consists of carrying out some kind of summarization of variables contained within your data. As you might already have guessed, the `summary()` command is usually an excellent starting point for this kind of examination. It can be used to describe vectors...
 
 
 {% highlight r %}
@@ -125,7 +125,7 @@ summary(iris$Sepal.Length) # a numeric() vector
 >   4.300   5.100   5.800   5.843   6.400   7.900
 {% endhighlight %}
 
-`summary()` can, of course, also be used to describe tabular data.
+`summary()` can, of course, also be used to describe tabular data. Note that the first four columns of the `iris` dataset are all of the `numeric()` type whereas the last column, Species, is a `factor()`. `summary()` adjusts its output accordingly.
 
 {% highlight r %}
 summary(iris)
@@ -155,7 +155,7 @@ summary(iris)
 
 ## Aggregation
 
-Many insights can be gained from aggregation of data. Especially when dealing with data that comprises both categorical variables and measurement variables the analyst can often learn much from aggregating data in different fashions. Unsurprisingly, `aggregate()` is the function you'll need most of the time. It makes extensive use of R's `formula()` interface (the `~` symbol). This is a slightly more complex way of looking at data, but can be a very efficient tool to gain slightly more complex insights on any significant in-data differences and which variables are potential predictors and which might be outcomes.
+Many insights can be gained from aggregation of data. Especially when dealing with data that comprises both categorical variables (a.k.a. background variables) and measurement variables (i.e. outcomes) the analyst can often learn much from aggregating data in different fashions. Unsurprisingly, `aggregate()` is the function you'll need most of the time. It makes extensive use of R's `formula()` interface (activated by the `~` operator). This is a slightly more complex way of looking at data, but can be a very efficient tool to gain more advanced insights, e.g. about any significant within-data differences or which variables are potential predictors and which might be outcomes.
 
 
 {% highlight r %}
@@ -171,10 +171,12 @@ aggregate(. ~ Species, data = iris, FUN = mean)
 > 3  virginica        6.588       2.974        5.552       2.026
 {% endhighlight %}
 
-`aggregate()` takes a FUN argument which is the function applied to the groups formed in data. This can be any function, even a user defined one.
+Here we see the result of aggregating the `iris` dataset and taking the mean value for all values in each column, and each species (there are three species of iris flowers recorded in the dataset).
 
+`aggregate()` takes a FUN argument which is the function applied to the aggregated groups.
 
 {% highlight r %}
+# Calculate the sum of all values within each group
 aggregate(. ~ Species, data = iris, FUN = sum)
 {% endhighlight %}
 
@@ -187,7 +189,24 @@ aggregate(. ~ Species, data = iris, FUN = sum)
 > 3  virginica        329.4       148.7        277.6       101.3
 {% endhighlight %}
 
-Another useful tool is the `table()` function which is used to create frequency tables, and its nephew `prop.table()`, used to create relative frequency tables.
+FUN can be any function, even a user defined one.
+
+{% highlight r %}
+# Create a user-defined function to determine the Coefficient of Variation
+coeff_of_var <- function(x) { sd(x) / mean(x) }
+aggregate(. ~ Species, data = iris, FUN = coeff_of_var)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+>      Species Sepal.Length Sepal.Width Petal.Length Petal.Width
+> 1     setosa   0.07041344   0.1105789   0.11878522   0.4283967
+> 2 versicolor   0.08695606   0.1132846   0.11030774   0.1491348
+> 3  virginica   0.09652089   0.1084387   0.09940466   0.1355627
+{% endhighlight %}
+
+Another useful tool is the `table()` function which is used to create frequency tables, and its nephew `prop.table()`, used to create relative frequency tables. The most basic usage is to use it to tabulate frequencies in vectors:
 
 
 {% highlight r %}
@@ -212,7 +231,7 @@ table(Nile)
 >    1    3    1    1    2    1    1    1    1    1
 {% endhighlight %}
 
-This can be applied to any kind of tabular data. However be warned: DO NOT pass an entire data frame with many variables and/or rows) to `table()` since this will cause it to tabulate all possible combinations of variables in the data set. If you really want to try it to obtain a better understanding of how `table()` works, make sure to try it on a really small dataset, like `table(cars)`.
+However, there are more useful ways of putting `table()` to work, since it can be applied to any kind of tabular data. However be warned: **DO NOT** pass an entire data frame containing many variables and/or rows to `table()` since this will cause it to tabulate all possible combinations of variables in the data set. If you really want to try doing this to obtain a better understanding of how `table()` works, make sure to try it on a _really_ small dataset, like `table(cars)` (`cars` has the dimensions 2x50).
 
 
 {% highlight r %}
@@ -306,6 +325,8 @@ prop.table(myTable, 2) # Column-wise relative frequencies
 
 Sometimes (well actually, most of the time when working with _real-world data_) data will have missing values in it. In R this is usually represented by the `NA` value. This is problematic, e.g. since many base functions like `sum()` will return `NA` if there is a single `NA` among the input values.
 
+To find out whether there are any missing values in a vector (or column, if you will) we turn to the `summary()` function yet again:
+
 
 {% highlight r %}
 summary(airquality$Solar.R)
@@ -318,7 +339,7 @@ summary(airquality$Solar.R)
 >     7.0   115.8   205.0   185.9   258.8   334.0       7
 {% endhighlight %}
 
-We can locate the positions of NA values using `which()`...
+So the column `Solar.R` in the `airquality` dataset contains 7 NA values. We can locate the positions of NA values using `is.na()` and then passing the output to `which()`...
 
 {% highlight r %}
 which(is.na(airquality$Solar.R))
@@ -330,7 +351,7 @@ which(is.na(airquality$Solar.R))
 > [1]  5  6 11 27 96 97 98
 {% endhighlight %}
 
-...and print the values using the vector returned by `which()` as an input
+...which returns a vector of positions within the vector. These are the row numbers in the `airquality` dataset that have NAs in them. We can now print these rows to learn what other data these rows contain:
 
 {% highlight r %}
 airquality[which(is.na(airquality$Solar.R)),]
@@ -411,11 +432,12 @@ myDF$Solar.R <- impute(myDF$Solar.R, fun = median)
 
 *To summarize:* `is.na()` and `which()` are useful commands for locating missing values and displaying them in some context (using tabular data). `impute()` can be used to impute values in place of the missing values if needed.
 
+
 ## Moving on
 
-This article introduces a subset of the tools I find myself using recurrently to inspect and analyse data. The last thing you saw in the article was how to _impute_ missing values, which is actually not about _learning_ about data but _modifying_ it, a thing that is often called Feature Engineering. This will be the topic of further posts in the future.
+This article introduces a subset of the tools I find myself using recurrently for data examination. The last thing you saw in the article was how to _impute_ missing values, which is actually not about _learning_ about data but _modifying_ it, in this case using a technique often referred to as Feature Engineering. This will be the topic of future posts.
 
-Seasoned R programmers might also object that many packages, like `Hmisc`, `psych`, `dplyr`, `data.table`, `stats`, and many others have functions for data inspection that are vastly superior to base-R functionality. I tend to agree on this, but I thought it'd be nice to provide R beginners (as well as myself) with a basic set of tools that one can easily learn without having to familiarize yourself with the API of any particular package (as any users of dplyr or data.table will tell you, the differences in how data is handled can vary substantially between packages!). Also, I constantly find myself returning to the base-R functions for the occasions when there is a particular task that my favorite dplyr or Hmisc function doesn't handle as well as it should.
+Seasoned R programmers might also object that many staple R packages, like `Hmisc`, `psych`, `dplyr`, `data.table`, `stats`, and many others have functions for data inspection that are vastly superior to base-R functionality. I tend to agree on this, but I thought it'd be nice to provide R beginners (as well as myself) with a basic set of tools that one can easily learn without having to familiarize yourself with the API of any particular package (as anyone familiar with both the dplyr and data.table packages will tell you, the differences in how data is handled can vary substantially between packages!). Also, I constantly find myself returning to the base-R functions for the occasions when there is a particular task that my favorite dplyr or Hmisc function doesn't handle as well as it should.
 
 All the source code on display here can be found in a separate Github repository here: [LCHansson/rTutorials](https://github.com/LCHansson/rTutorials). If you think anything in the code should be improved, please consider making a pull request to that repository and I will update this page accordingly.
 
