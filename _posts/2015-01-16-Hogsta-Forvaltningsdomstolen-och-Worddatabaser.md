@@ -1,0 +1,628 @@
+---
+title: 'Extracting data from a DOCX collection from scratch'
+date: '2015-01-16'
+author: LCHansson
+layout: post
+tags: [R, scraping, databases]
+comments: yes
+lang: en
+---
+
+<section id="table-of-contents" class="toc">
+<header>
+<h3>Overview</h3>
+</header>
+<div id="drawer" markdown="1">
+*  Auto generated table of contents
+{:toc}
+</div>
+</section><!-- /#table-of-contents -->
+
+In the following article I describe how I went about to construct a minimal R scraper to extract meaningful information from a semi-structured collection of Word files and gather the information in a structured database.
+
+My intention is first and foremost to show that it is really easy to extract information from Word files and that it does not take any tremendous hacker skills to do so. Word files (.docx) are basically just a collection of XML files (it's basically a web page with some odd formatting), so extracting information from them is really a piece of cake.
+
+All the code that is included in this article is written in R, and can be found in [this Github repository] together with the entire Word file example database that was used.
+
+If you're not interested in the reasons _why_ I did this you can skip the next section and jump right onto the code and the technical details in the following sections.
+
+
+## A Brief Background
+
+I was recently intrigued by a ruling in the Supreme Administrative Court of Sweden (571-14) [(here's a PDF of the official protocol)](http://www.hogstaforvaltningsdomstolen.se/Domstolar/regeringsratten/Avg%C3%B6randen/2015/Januari/571-14.pdf). At the beginning of this 2015 the Court (which is the supreme court, i.e. the third and final tier, for administrative court cases in Sweden) handled a case where a privately run company that offered financial investigation services about private persons to companies (e.g. for recruitment purposes) had built up a database containing neatly structured Word files with tons of sensitive and potentially compromising information about individuals. In Sweden, it is illegal to maintain a structured database about individuals without their consent. However, to my surprise, the Court ruled that the database was perfectly legal. In its motivation the Court made the argument that the database was a) not _intended to be used for systematic searching or other querying_, and b) not _structuerd in such a way as to enable such queries by third parties (or the company itself)_.
+
+To me, this seemed absurd. Does the _storage format_ of sensitive electronic information decide what legal status it enjoys? How can a database not be searchable just because it's stored in Word files? Since modern Word files (i.e. the .docx format) are just compressed XML files it should be a piece of cake to use these as an XMl database. I mean, how hard can it be to either insert the documents into a document database or build a scraper that just scrapes the XML for interesting information single handedly?
+
+To obtain an answer to the latter question I decided to simply try it out. In the following post I make an attempt to show how one can easily construct a scraper for an unstructued archive of .docx files, extract relevant information, and structure it into a tidy database. The whole process of writing the code took me around three hours, but any experienced coder with some understanding of web and/or xml scraping/parsing would probably be able to do it in half that time. The code is entirely written in *R*.
+
+I will not go into a discussion about the legal issues regarding this matter. I have been fortunate enough to be able to get some input from friends who are actual lawyers and have thus come to realise that the legal considerations involved are more complex than one might think at first glance.
+
+
+## The data
+
+In the court case discussed above, the actual database allegedly contained relatively structured information about private individuals' personalia, their economic status (income, debts, etc.), business involvements and their criminal record. An educated guess might be that the documents involved were created using a predefined _template_ containing pre-set headings for all the sections in the documents. To emulate this situation (which I think is a reasonable assumption in lots of cases where one wants to scrape a huge collection of Word files for data) I created a folder structure containing six different .docx files (in Swedish) containing section headlines indicating what kind of information would be stored there. I then entered some random made-up data in an unstructured and slightly erratic way.
+
+To illustrate this, consider the two following examples. They contain the same kind of information, but with very different internal structures:
+
+*Example 1*
+![](/images/2015-01-16-Wordfiler/secrets1.png)
+
+*Example 2*
+![](/images/2015-01-16-Wordfiler/secrets2.png)
+
+The files also contain other random data, like comments, headings, and so on.
+
+To more closely emulate what a "real" document collection might look like, I placed the files in a not-so-structured file structure like this:
+
+![](/images/2015-01-16-Wordfiler/filetree.png)
+
+It should be noted, however, that it is entirely irrelevant for scraping purposes what the folder structure looks like and what the files are named. _The only important thing is the internal structure of each file_.
+
+## Preparing to build a scraper
+
+So now we have our raw data - a folder tree with .docx files.
+
+As I mentioned in the beginning of this article, .docx files are nothing but .zip files containing a tree of XML files. if you're interested in the internal structure of a .docx file you can just run it through any unzip software and have a look at its internals. A brief description of the contents can be found all over the Internet, like [here](http://officeopenxml.com/anatomyofOOXML.php), but for most purposes the only thing you need to know is this: all plain text content from the file can be found in the file *word/content.xml*.
+
+In our example data the content is stored in text files. So the procedure to extract data from the files can be summarised in the following steps.
+
+1. Unzip each word file
+2. Load the raw contents of word/content.xml and merge into an array containing data from all the files
+3. Parse the XMl raw data into a list/array/whatever messy data structure you prefer.
+4. Investigate data to correct for any obvious errors such as missing data.
+5. Only keep the interesting bits of data and store them as [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf).
+6. Presto!
+
+In setting up this process, we need to find some tools to automate as much of this process as possible. I find the following packages to be particularly useful when setting up data management flows: *dplyr* (for management of tabular data and functional piping), *stringr* (for text processing), and *rvest* (for XML parsing and web scraping). We also need to set some runtime variables.
+
+(Note: If you're not very used to reading R code you might be confused by the frequent usage of the operator `%>%` below. This is the _pipe_ operator, used for functional chaining and to create easily readable code. You can read more about dplyr and the pipe operator in R [here](https://www.dropbox.com/sh/i8qnluwmuieicxc/AACsepZJvULCKkbIxK9KP-6Ea/dplyr-tutorial.pdf?dl=0).)
+
+
+{% highlight r %}
+## Libraries ----
+library("dplyr")
+library("stringr")
+library("rvest")
+library("methods") # This is only needed to enable XML parsing functions in rvest
+
+## Run vars ---- l
+tmp_folder <- "2015-01-16-Wordfiler/unzipped"
+unzipopts <- "-o"
+{% endhighlight %}
+
+
+## Getting the data
+
+Now that we have our environment set up, we are ready to start unzipping our word files and loading the XML contents into R. The following code does the following:
+
+First, it lists all the files in the document folder. For each file, it then unzips the .docx file, reads the contents of _word/document.xml_ into R, parses the XML tree, extracts the "<p>" elements from the XML and stores them as a `list()`.
+
+Having created a `list()` with the contents of all the "<p>" elements, the script then proceeds to determine which ones of these are _section headings_. To find out what element to look for I simply opened one of the XML files in a text editor and searched for the text in one of the headers. It turns out that all headings are contained within "<ppr>" elements.
+
+Once it knows what elements are headers, the script simply interprets the elements following headers as content belonging to that particular heading.
+
+
+
+{% highlight r %}
+## Extract data from doc ----
+docs <- list.files("2015-01-16-Wordfiler/dokument", recursive = TRUE, full.names = TRUE)
+docs <- gsub(" ", "\\ ", docs, fixed = TRUE)
+
+scraped_data <- list()
+
+for (i in 1:length(docs)) {
+  doc <- docs[i]
+  
+  # unzip DOC file
+  paste(getwd(), tmp_folder, i, sep = "/")
+  system2("unzip", paste(unzipopts, doc, "-d", paste(getwd(), tmp_folder, i, sep = "/")))
+  system2("pwd", stdout = TRUE)
+  
+  # Read data from file
+  path <- file.path(getwd(), "2015-01-16-Wordfiler/unzipped", i, "word/document.xml")
+  xdoc <- xml(path)
+  
+  # Get relevant XML nodes ("p")
+  paragraphs <- xdoc %>%
+    xml_node("body") %>%
+    xml_node("body") %>%
+    xml_nodes("p")
+  
+  # Which nodes are headers? ("ppr")
+  is_header <- paragraphs %>% sapply(function(node) {
+    headernodes <- node %>% xml_nodes("ppr")
+    length(headernodes)
+  })
+  
+  dataRows <- list()
+  
+  for (j in 1:length(is_header)) {
+    if (is_header[j] == 1) {
+      ## If the node is a header, store its contents as "header"
+      
+      # Clear data list
+      data <- list()
+      
+      # Get header name
+      header_name <- paragraphs[j] %>%
+        xml_text()
+      
+      # Fix encoding due to random encoding handling in Windows
+      Encoding(header_name) <- "UTF-8"
+      
+      # Debug: uncomment this line to make R report what it's doing
+      # cat("Header name: ", header_name, "\n")
+      
+    } else {
+      ## If the node is not a header, store its contents as list "data"
+      content <- paragraphs[j] %>%
+        xml_nodes("t") %>%
+        xml_text()
+      Encoding(content) <- "UTF-8"
+      
+      # Debug: uncomment this line to make R report what it's doing
+      # cat("Text: ", content, "\n")
+      
+      data <- data %>% append(list(content))
+    }
+    
+    # Save data from last run
+    if (is.na(is_header[j+1])) {
+      dataRows <- dataRows %>% append(list(list(header = header_name, data = data)))
+    } else if (is_header[j+1] == 1) {
+      dataRows <- dataRows %>% append(list(list(header = header_name, data = data)))
+    }
+  }
+  
+  scraped_data <- scraped_data %>% append(list(dataRows))
+}
+{% endhighlight %}
+
+Running this leaves us with `scraped_list`, which is a messy list containing all the data in the .docx files divided into _header_ and _data_ sublists.
+
+Note that doing this scraping we left out tons of data. Looking at the XML file you'll find loads of information, including formatting tags and other metadata. Storing this data as well basically would require 2-3 lines of additional code.
+
+
+## Tidying up
+
+So what do we do with our messy, unstructured data now that we've scraped it from the Word files? Just looking at the plain list can be sightly intimidating; it's a long list! However, since we actually defined the structure of the list in our code above, we already know that the structure of the list looks as follows:
+
+
+{% highlight r %}
+# List structure:
+# [n](doc) >
+#  [n](paragraph) >
+#    header
+#    data >
+#       [n](text)
+{% endhighlight %}
+
+So now our task is to extract the [data] element from each instance of [doc/paragraph] and mark it with the contents of [header]. If headers are the same across documents, we won't even need to do any manual cleaning.
+
+So let's do it! First, we need to create an empty `data.frame()`.
+
+
+{% highlight r %}
+# Create an empty data.frame container
+dokumentdata <- data.frame(
+  docnum = integer(),
+  header = character(),
+  text = character()
+)
+{% endhighlight %}
+
+We then traverse the list of scraped data, binding each subset as a row to the data.frame.
+
+
+{% highlight r %}
+# Loop variables
+docnum <- 0
+row <- 0
+
+# Loop through all the documents
+for (doc in scraped_data) {
+  # What document are we looking at?
+  docnum <- docnum + 1
+  
+  # Loop through each paragraph in the document
+  for (par in doc) {
+    # Header element
+    header <- par$header
+    
+    # Loop through all "data" elements related to a certain header
+    for (text in par$data) {
+      if (length(text) == 0) {
+        # If there are no data elements under a given header, don't attempt to store it.
+        
+        # Debug: uncomment this line to make R report what it's doing
+        # cat("No text; passing\n")
+        next()
+      }
+      
+      # If there were several text elements, coerce them into a single character string
+      text <- paste(text, collapse = "")
+      
+      # Create a row to bind to the data.frame
+      datarow <- list(docnum = docnum, header = header, text = text)
+      
+      # Debug: uncomment the following lines to make R report what it's doing
+      # row <- row + 1
+      # cat(paste0(row, ": docnum: ", docnum, "; header: ", header, "; text: ", text), "\n")
+      
+      # Bind the data row to the data.frame
+      dokumentdata <- bind_rows(dokumentdata, as_data_frame(datarow))
+    }
+  }
+}
+{% endhighlight %}
+
+We have now stored our data in a single table. This means we should finally be able to look at our data:
+
+
+{% highlight r %}
+print(dokumentdata, n = 20)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+> Source: local data frame [59 x 3]
+> 
+>    docnum           header                                                   text
+> 1       1 Hemligt dokument                                          Lite brödtext
+> 2       1       Personalia                                  Personnr: 234568-9843
+> 3       1       Personalia                                 Namn: Mehred Mehredsjö
+> 4       1         Brottmål                                  Mål 471-546 (frikänd)
+> 5       1         Brottmål Kommentar om att personen aldrig varit dömd i brottmål
+> 6       1          Ekonomi                            Årsinkomst 2013: 300 000 kr
+> 7       1          Ekonomi                                 Inkomst 2012 – 250 000
+> 8       1          Ekonomi                     Fem ärenden hos inkasso under 2012
+> 9       1           Övrigt                                            Bla bla bla
+> 10      2 Hemligt dokument                                          Lite brödtext
+> 11      2       Personalia                                  Personnr: 123456-7890
+> 12      2       Personalia                                    Namn: Namn Namnsson
+> 13      2         Brottmål                                             Mål 123-65
+> 14      2         Brottmål        Kommentar om att personen varit dömd i brottmål
+> 15      2          Ekonomi                            Årsinkomst 2013: 514 000 kr
+> 16      2          Ekonomi                                       2012: 123 000 kr
+> 17      2          Ekonomi                                    Skulder: 141 000 kr
+> 18      2          Ekonomi      Kronofogden: 3st betalningsanmärkningar 2011-2012
+> 19      2           Övrigt                                              Blablabla
+> 20      3 Hemligt dokument                                          Lite brödtext
+> ..    ...              ...                                                    ...
+{% endhighlight %}
+
+Now we're getting somewhere! This is starting to look like a proper database. And all we've done is build a script that automatically parses the XML of all Word files stored in a folder including subfolders, and store the data ewe're looking for in a table. Who said it wasn't easy to build a database from Word documents?!
+
+It should probably be stressed that _we are now done building a searchable database_! Using the `docnum` column as key we can now quickly sift through all documents in the database to extract tons of information about any or all persons in it.
+
+However, we're not done yet. The `text` column is clearly still really messy. To truly make the database usable we still need to create some order from this messy chaos.
+
+
+## Tidying data for database integration
+
+The `header` column tells us what headings are available in all the documents. At the beginning of this article I made the assumption that the headers were going to be more or less the same across documents. Let's see if I was right!
+
+
+{% highlight r %}
+by(dokumentdata, dokumentdata$docnum, FUN = function(x) unique(x$header))
+{% endhighlight %}
+
+
+
+{% highlight text %}
+> dokumentdata$docnum: 1
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 2
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 3
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 4
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Årsinkomster"    
+> [5] "Skulder"          "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 5
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 6
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"
+{% endhighlight %}
+
+As we can see the unique header values are the same for five of the six documents, just as expected. However, one document differs by having replaced the header "Ekonomi" (economy) with the two headings "Årsinkomster" (yearly income) and "Skulder" (debts). Probably some lazy intern that accidentally replaced the standard heading with two new ones! We'll have to take that into account when we do our final munging.
+
+This is reassuring. Confident that all documents hade headings describing the kind of data we're looking for, we can now go through the data category by category and extract only the data we're looking for.
+
+
+#### Choice of data
+
+The sections above outlined what kind of data might be contained in the database. In this example I have decided that I am interested in finding out about the private incomes and frequency of court case involvement among the persons in the database. I will thus focus on the following data:
+
+- Personalia: Identity data
+- Economy: Annual income data
+- Court cases: IDs of any court cases the person might have been involved in
+- Misc: Comments (we migt want to store this for later)
+
+There's more information stored in the database (e.g. debt information), but we'll ignore that for now.
+
+#### Personalia
+
+Starting with the "Personalia" ceategory, we first filter out the rows where `header` == "Personalia". This leaves us with only two kinds of rows; rows containing name, and rows containing Personal Identification Number (the Swedish personal identification number). 
+
+
+{% highlight r %}
+personalia_raw <- dokumentdata %>%
+  filter(header == "Personalia") %>%
+  group_by(docnum)
+
+print(personalia_raw, n = 12)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+> Source: local data frame [12 x 3]
+> Groups: docnum
+> 
+>    docnum     header                            text
+> 1       1 Personalia           Personnr: 234568-9843
+> 2       1 Personalia          Namn: Mehred Mehredsjö
+> 3       2 Personalia           Personnr: 123456-7890
+> 4       2 Personalia             Namn: Namn Namnsson
+> 5       3 Personalia           Personnr: 214365-8709
+> 6       3 Personalia       Namn: Charlie Charlieberg
+> 7       4 Personalia           Personnr: 661122-0033
+> 8       4 Personalia Namn: Svinlaug S. Svinlaugsbäck
+> 9       5 Personalia           Personnr: 123456-7890
+> 10      5 Personalia               Namn:Anka Anksson
+> 11      6 Personalia           Personnr: 123456-7890
+> 12      6 Personalia  Namn: Vildsvin Vildsvinsdotter
+{% endhighlight %}
+
+We then extract `name` and `personnr` using further filtering and perl-style regular expressions. For extracting the names we simply cut out everything following the signifier "Namn:" and strip off whitespace. "Personnr" always follows the standard form YYMMDD-XXXX, so we search for thar exact pattern and extract it.
+
+
+{% highlight r %}
+namn <- personalia_raw %>%
+  filter(str_detect(text, "namn" %>% ignore.case())) %>%
+  mutate(
+    # Extract all characters following the string "Namn:"
+    namn = str_extract_all(text, "(?<=namn:).*" %>% perl() %>% ignore.case())[[1]] %>%
+      # and then remove surrounding whitespace
+      str_trim()
+  ) %>%
+  select(docnum, namn)
+
+personnr <- personalia_raw %>%
+  filter(str_detect(text, "\\d{6}-\\d{4}" %>% perl())) %>%
+  # Extract strings on the form DDDDDD-DDDD
+  mutate(personnr = str_extract_all(text, "\\d{6}-\\d{4}" %>% perl())[[1]]) %>%
+  select(docnum, personnr)
+{% endhighlight %}
+
+This can now be repeated for other data that might be interesting. In this example I've decided that I'm particularly interested in yearly incomes, court case involvement, and the comments in the final "Övrigt" (misc.) section that concludes each document in the database.
+
+
+#### Economy
+
+Let's start with economic data. Remembering what we learned about the glitch in header naming in our investigation above, we include both the standard header ("Ekonomi") and the odd header ("Årsinkomster") into our data.
+
+To understand how to extract data, let's take a look at the "text" variable:
+
+
+{% highlight r %}
+ekonomi_raw <- dokumentdata %>%
+  filter(header == "Ekonomi" | header == "Årsinkomster") %>%
+  group_by(docnum)
+
+ekonomi_raw$text
+{% endhighlight %}
+
+
+
+{% highlight text %}
+>  [1] "Årsinkomst 2013: 300 000 kr"                                                               
+>  [2] "Inkomst 2012 – 250 000"                                                                    
+>  [3] "Fem ärenden hos inkasso under 2012"                                                        
+>  [4] "Årsinkomst 2013: 514 000 kr"                                                               
+>  [5] "2012: 123 000 kr"                                                                          
+>  [6] "Skulder: 141 000 kr"                                                                       
+>  [7] "Kronofogden: 3st betalningsanmärkningar 2011-2012"                                         
+>  [8] "Årsinkomst 2013: 45 000:-"                                                                 
+>  [9] "2011 tjänade personen 537019 kr"                                                           
+> [10] "Inga skulder"                                                                              
+> [11] "Kronofogden: inga anmärkningar"                                                            
+> [12] "2013: 450 000"                                                                             
+> [13] "2012: 420 000"                                                                             
+> [14] "2011: 415 000"                                                                             
+> [15] "2010: 360 000"                                                                             
+> [16] "2009: 300 000"                                                                             
+> [17] "Årsinkomst: 220 000 (2010), 230 000 (2011), 231 456 (2012), 240 071 (2013), 260 765 (2014)"
+> [18] "Inga skulder"                                                                              
+> [19] "Årsinkomst 2014: 514 100 kr"                                                               
+> [20] "Vildsvin är helt skuldfri"
+{% endhighlight %}
+
+So here, we can note three things:
+
+1. Incomes are always five or six digits. A space is sometimes inserted between exponents of 10^3 to make figures more readable. We'll have to remove those spaces.
+2. Years always start with "20", followed by two digits. It'll be easy to locate.
+3. Row 17 has five different years AND incomes on the same row. We'll have to separate those into five separate rows.
+
+
+{% highlight r %}
+# Extract income data
+inkomster <- ekonomi_raw %>%
+  filter(str_detect(text, "\\d{2,3}(\\s)?\\d{3}" %>% perl())) %>%
+  mutate(
+    ar = str_extract(text, "20\\d{2}" %>% perl()),
+    inkomst = str_extract(text, "\\d{2,3}(\\s)?\\d{3}" %>% perl())
+  )
+
+
+# Separate the single row for document 5 into five separate rows
+ink5 <- ekonomi_raw$text[ekonomi_raw$docnum == 5][[1]]
+yrs <- str_extract_all(ink5, "(?<=\\()\\d{4}(?=\\))" %>% perl())[[1]]
+ink <- str_extract_all(ink5, "\\d{2,3}(\\s)?\\d{3}" %>% perl())[[1]]
+inkomster_5 <- data_frame(
+  docnum = 5,
+  ar = yrs,
+  inkomst = ink,
+  header = "Ekonomi"
+)
+
+# Replace data for document 5 with the munged data
+# and convert the string "XXX XXX" into an integer
+inkomster <- inkomster %>%
+  filter(!is.na(ar), docnum != 5) %>%
+  bind_rows(inkomster_5) %>%
+  select(-text, -header) %>%
+  mutate(inkomst = inkomst %>% str_replace_all("[[:blank:]]", "") %>% as.integer())
+{% endhighlight %}
+
+#### Court cases
+
+We repeat the procedure for court cases. First, we look at the text variable:
+
+
+{% highlight r %}
+## Brottmål
+brottmal_raw <- dokumentdata %>%
+  filter(header == "Brottmål") %>%
+  group_by(docnum)
+
+brottmal_raw$text
+{% endhighlight %}
+
+
+
+{% highlight text %}
+>  [1] "Mål 471-546 (frikänd)"                                                         
+>  [2] "Kommentar om att personen aldrig varit dömd i brottmål"                        
+>  [3] "Mål 123-65"                                                                    
+>  [4] "Kommentar om att personen varit dömd i brottmål"                               
+>  [5] "Mål 555-55"                                                                    
+>  [6] "Kommentar om att personen varit dömd i brottmål"                               
+>  [7] "Inga brottmål"                                                                 
+>  [8] "Kommentar: Svinlaug är helt straffri."                                         
+>  [9] "Mål 632-632: Åtalad för snatteri men frikänd"                                  
+> [10] "Mål 871-192: Åtalad för uppseendeväckande beteende men frikänd"                
+> [11] "Mål 736-928: Dömd för grov stöld till dagsböter och 2 månaders villkorlig dom."
+> [12] "Mål 987-654"                                                                   
+> [13] "Mål 123-456"                                                                   
+> [14] "Kommentar om att personen är straffri"
+{% endhighlight %}
+
+This data clearly has a lot of comments in it. Comments might be very interesting data, but for now we'll focus on just the court cases. Luckily, Swedish court rulings all seem to follow the pattern "XXX-XX[X]". It should be sufficient to just search for exactly that pattern, then.
+
+
+{% highlight r %}
+# Filter out court cases
+brottmal <- brottmal_raw %>%
+  filter(str_detect(text, "\\d{3}-\\d{2,3}")) %>%
+  mutate(inblandad_i_mal = str_extract(text, "\\d{3}-\\d{2,3}")) %>%
+  select(docnum, inblandad_i_mal)
+{% endhighlight %}
+
+#### Comment data
+
+Finally, we'll extract any comments stored under the "misc." section of each document.
+
+
+{% highlight r %}
+ovrigt <- dokumentdata %>%
+  filter(header == "Övrigt") %>%
+  select(docnum, kommentar = text)
+{% endhighlight %}
+
+## Putting it all together
+
+Now we're almost done. All we need to do now is to add all the little data sets we just created back together to make a proper database. Luckily, we used the "docnum" as a key when creating all our smaller tables above, so we can just reuse that as a primary key when joining tables together.
+
+
+{% highlight r %}
+# Put everything together into a proper database
+persondatabas <- namn %>%
+  left_join(personnr, by = "docnum") %>%
+  left_join(ovrigt, by = "docnum")
+
+# Adding income and court case data creates more than one row per person
+persondatabas_stor <- persondatabas %>%
+  left_join(inkomster, by = "docnum") %>%
+  left_join(brottmal, by = "docnum")
+{% endhighlight %}
+
+
+And presto! Our own tidy, easily searchable database - created from "unstructured", "non-searchable" Word documents.
+
+To wrap up, let's give a couple of examples of how this database could actually be used. Let's say we want to investigate who's the top and bottom income holder (using the most recent data on each person):
+
+
+{% highlight r %}
+persondatabas %>%
+  # Only keep the columns we're interested in
+  select(-kommentar) %>%
+  # Join with income data
+  left_join(inkomster, by = "docnum") %>%
+  # Last year per person only
+  filter(ar == max(ar)) %>%
+  # Only keep top and bottom income holders
+  ungroup() %>%
+  filter(inkomst == max(inkomst) | inkomst == min(inkomst))
+{% endhighlight %}
+
+
+
+{% highlight text %}
+> Source: local data frame [2 x 5]
+> 
+>   docnum                     namn    personnr   ar inkomst
+> 1      3      Charlie Charlieberg 214365-8709 2013   45000
+> 2      6 Vildsvin Vildsvinsdotter 123456-7890 2014  514100
+{% endhighlight %}
+
+So Vildsvin Vildsvinsdotter is the top income holder in the database, and Charlie Charlieberg is the bottom income holder.
+
+As a second example, let's say we want to plot number of court case involvements versus incomes. In this case we'll use the medium income for each person.
+
+
+{% highlight r %}
+library("ggplot2")
+library("scales")
+persondatabas %>%
+  group_by(docnum, namn, personnr) %>%
+  select(-kommentar) %>%
+  left_join(inkomster, by = "docnum") %>%
+  summarise(medelinkomst = mean(inkomst)) %>%
+  left_join(brottmal, by = "docnum") %>%
+  group_by(docnum, namn, personnr, medelinkomst) %>%
+  summarise(antal_brottmal = sum(!is.na(inblandad_i_mal))) %>%
+  ggplot(aes(x = medelinkomst, y = antal_brottmal, color = namn)) +
+  geom_point(size = 10) +
+  labs(title = "Medelinkomst vs inblandning i brottmål (fiktiva data)", x = "Medelinkomst", y = "Antal brottmål 2010-2014") +
+  scale_color_brewer(palette = "Set1") +
+  scale_x_continuous(labels = comma)
+{% endhighlight %}
+
+![center](/../fig/2015-01-16-Hogsta-Forvaltningsdomstolen-och-Worddatabaser/unnamed-chunk-13-1.png) 
+
+
+So we can see that the persons with the lowest and the highest mean income are also the ones with the highest court case involvement. Interesting!
+
+
+## Wrapping it up
+
+The purpose of this article was to give an example of how to go about to create a searchable database from a collection of semi-structured Word files. In doing so we extracted all the data from the Word files, gathered them into an unstructured list, and then added structure to the data finally arriving at a searchable, tidy, human-readable database.
+
+The purpose of this article was to show that this process is easily done. Although this article has been quite lengthy, the code itself took me no more than three hours to write. Setting up a production flow using this code to provide a real-time database that automatically searches through a Word file storage and keeps an updated database with the results could be done in a couple of minutes.
+
+It should be noted that I am not a very good programmer. Back-end experts might have serious objections to my code above, and you are of course welcome to leave a comment below or bash me on Twitter or StackOverflow (links above)! In the best of worlds this article could be used as an example of investigative journalism or perhaps to show R newbies how to go about solving a moderately complex data problem in R.
+
+On a final note, it is natural to assume that any real-world problem might contain complexities not covered in this article. Virtually no time was spent on quality assurance of the code above, and there might be horrific errors to the code, creating faulty data.
