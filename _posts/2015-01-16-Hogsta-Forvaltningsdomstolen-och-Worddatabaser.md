@@ -611,7 +611,7 @@ persondatabas %>%
   scale_x_continuous(labels = comma)
 {% endhighlight %}
 
-![center](/../fig/2015-01-16-Hogsta-Forvaltningsdomstolen-och-Worddatabaser/unnamed-chunk-13-1.png) 
+<img src="/../fig/2015-01-16-Hogsta-Forvaltningsdomstolen-och-Worddatabaser/unnamed-chunk-13-1.png" title="center" alt="center" width="10" />
 
 
 So we can see that the persons with the lowest and the highest mean income are also the ones with the highest court case involvement. Interesting!

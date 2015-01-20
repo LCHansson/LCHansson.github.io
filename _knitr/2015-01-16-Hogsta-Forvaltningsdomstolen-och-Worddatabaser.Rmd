@@ -454,7 +454,7 @@ So Vildsvin Vildsvinsdotter is the top income holder in the database, and Charli
 
 As a second example, let's say we want to plot number of court case involvements versus incomes. In this case we'll use the medium income for each person.
 
-```{r}
+```{r, fig.width=10, out.width=10}
 library("ggplot2")
 library("scales")
 persondatabas %>%
