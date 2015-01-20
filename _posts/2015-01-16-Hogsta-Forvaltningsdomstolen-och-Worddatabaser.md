@@ -272,7 +272,7 @@ print(dokumentdata, n = 20)
 >    docnum           header                                                   text
 > 1       1 Hemligt dokument                                          Lite brödtext
 > 2       1       Personalia                                  Personnr: 234568-9843
-> 3       1       Personalia                                 Namn: Mehred Mehredsjö
+> 3       1       Personalia                                  Namn: Sven Svenljunga
 > 4       1         Brottmål                                  Mål 471-546 (frikänd)
 > 5       1         Brottmål Kommentar om att personen aldrig varit dömd i brottmål
 > 6       1          Ekonomi                            Årsinkomst 2013: 300 000 kr
@@ -374,7 +374,7 @@ print(personalia_raw, n = 12)
 > 
 >    docnum     header                            text
 > 1       1 Personalia           Personnr: 234568-9843
-> 2       1 Personalia          Namn: Mehred Mehredsjö
+> 2       1 Personalia           Namn: Sven Svenljunga
 > 3       2 Personalia           Personnr: 123456-7890
 > 4       2 Personalia             Namn: Namn Namnsson
 > 5       3 Personalia           Personnr: 214365-8709
