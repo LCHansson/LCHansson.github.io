@@ -8,6 +8,15 @@ comments: yes
 lang: en
 ---
 
+In the following article I describe how I went about to construct a minimal R scraper to extract meaningful information from a semi-structured collection of Word files and gather the information in a structured database.
+
+My intention is first and foremost to show that it is really easy to extract information from Word files and that it does not take any tremendous hacker skills to do so. Word files (.docx) are basically just a collection of XML files (it's basically a web page with some odd formatting), so extracting information from them is really a piece of cake.
+
+All the code that is included in this article is written in R, and can be found in [this Github repository] together with the entire Word file example database that was used.
+
+If you're not interested in the reasons _why_ I did this you can skip the next section and jump right onto the code and the technical details in the following sections.
+
+
 <section id="table-of-contents" class="toc">
 <header>
 <h3>Overview</h3>
@@ -17,14 +26,6 @@ lang: en
 {:toc}
 </div>
 </section><!-- /#table-of-contents -->
-
-In the following article I describe how I went about to construct a minimal R scraper to extract meaningful information from a semi-structured collection of Word files and gather the information in a structured database.
-
-My intention is first and foremost to show that it is really easy to extract information from Word files and that it does not take any tremendous hacker skills to do so. Word files (.docx) are basically just a collection of XML files (it's basically a web page with some odd formatting), so extracting information from them is really a piece of cake.
-
-All the code that is included in this article is written in R, and can be found in [this Github repository] together with the entire Word file example database that was used.
-
-If you're not interested in the reasons _why_ I did this you can skip the next section and jump right onto the code and the technical details in the following sections.
 
 
 ## A Brief Background
