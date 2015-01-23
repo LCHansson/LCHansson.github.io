@@ -1,5 +1,5 @@
 ---
-title: 'Skapa en databas från Wordfiler'
+title: 'Hur man skapar en databas från Wordfiler'
 date: '2015-01-22'
 author: LCHansson
 layout: post
@@ -13,7 +13,7 @@ _Detta är den andra artikeln i en serie fristående artiklar som jag skrev i b�
 _Läs även gärna de övriga artiklarna i serien:_
 
 1. [PUL och Worddatabaser](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-1/) (juridiska och politiska aspekter)
-2. Använda Wordfiler som en sökbar databas, del 1: Extrahera data (programmering och databearbetning)
+2. Hur man skapar en databas från Wordfiler (programmering och databearbetning)
 3. Använda Wordfiler som en sökbar databas, del 2: Städa upp i data (kommer inom kort)
 4. Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar? (kommer inom kort)
 
@@ -22,6 +22,9 @@ _Läs även gärna de övriga artiklarna i serien:_
 I denna artikel visar jag hur man, med hjälp av förhållandevis lite programkod, enkelt kan bygga en sökbar databas av en samling halvstrukturerade Worddokument. Till skillnad från den föregående artikeln i denna serie kommer jag här helt att fokusera på själva datahanteringsuppgiften, med hjälp av exempelkod skriven i **R**. Artikeln diskuterar både anatomi och arkitektur för själva dataproblemet.
 
 Den programkod och de Worddokument som används nedan kan laddas hem, i lätt modifierad version, från [det här Github-repot](https://github.com/LCHansson/541_17-exempel). Ladda gärna ned repot, lek runt med koden och berätta hur det gick i kommentarsfältet nedan!
+
+En disclaimer är på sin plats. Varje någorlunda begåvad databasadministratör eller programmerare kommer nog inte att ha så mycket nytta av denna text. Syftet har varit att visa på en av många metoder för att komma åt och analysera innehållet i Wordfiler. Om man skulle vilja sätta upp ett produktionsflöde för att _faktiskt_, under _verkliga förhållanden_ använda Word som databasplattform, skulle man naturligtvis använda sig av ett helt annat tillvägagångssätt. Min förhoppning med denna artikel är på sin höjd att kunna ge ett trovärdigt exempel på hur någon med högst måttliga programmeringskunskaper skulle kunna gå tillväga för att göra ett snabbt grävjobb eller liknande.
+
 
 ## Data: Några exempeldokument
 
@@ -36,6 +39,8 @@ Här är två exempel för att illustrera detta:
 
 *Exempel 2*
 ![](/images/2015-01-16-Wordfiler/secrets2.png)
+
+![](/images/2015-01-16-Wordfiler/secrets3.png)
 
 Den som är intresserad av ytterligare detaljer kan ladda ned samtliga wordfiler från [exempelrepot](https://github.com/LCHansson/541_17-exempel).
 
@@ -52,7 +57,7 @@ Så nu har vi vår rådata - en mappstruktur med ett antal .docx-filer.
 
 Som jag nämnde ovan är en .docx-fil ingenting annat än en zip-komprimerad mapp med ett antal XML-filer i. Den som är intresserad av att titta närmare på en DOCX-fils innehåll kan öppna den själv i valfritt unzip-program för att få fram mappen. Vill man ha en exakt specifikation över vilka filer som ingår och hur de är strukturerade kan lätt hitta en sådan på internet, t.ex. [här](http://officeopenxml.com/anatomyofOOXML.php), men egentligen är det enda vi behöver känna till detta: allt textinnehåll (som inte ingår i en tabell eller en graf) kan hittas i filen *word/content.xml*.
 
-Eftersom all data vi är intresserade av här lagras i klartext i Worddokumentet, kan hela proceduren för att bygga en databas från Wordfiler sammanfattas som följer:
+Eftersom all data vi är intresserade av här lagras i klartext i Worddokumentet, kan hela proceduren för att bygga en databas från Wordfiler sammanfattas som följer. I denna artikel koncentrerar jag mig på steg 1-3 nedan, medan nästa artikel behandlar steg 4-6.
 
 1. Avrkomprimera varje Wordfil
 2. Gå igenom innehållet i varje fil och lagra resultatet i en array som innehåller data från samtliga filer
@@ -284,7 +289,7 @@ print(dokumentdata, n = 20)
 
 
 {% highlight text %}
-> Source: local data frame [62 x 3]
+> Source: local data frame [65 x 3]
 > 
 >    docnum           header                                                   text
 > 1       1  Personuppgifter                                          Lite brödtext
