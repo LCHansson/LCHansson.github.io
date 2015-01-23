@@ -14,8 +14,8 @@ _Läs även gärna de övriga artiklarna i serien:_
 
 1. PUL och Worddatabaser (juridiska och politiska aspekter)
 2. [Använda Wordfiler som en sökbar databas, del 1: Att extrahera Worddata och gör det sökbart](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (programmering och databearbetning)
-3. [Använda Wordfiler som en sökbar databas, del 2: Skapa ordning i datakaoset](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-3/) (programmering och databearbetning)
-4. [Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar?](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-1/) (juridiska och politiska aspekter)
+3. Använda Wordfiler som en sökbar databas, del 2: Skapa ordning i datakaoset (kommer inom kort)
+4. Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar? (kommer inom kort)
 
 
 ## Inledning

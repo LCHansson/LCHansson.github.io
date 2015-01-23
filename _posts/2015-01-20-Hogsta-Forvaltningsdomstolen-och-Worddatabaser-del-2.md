@@ -1,0 +1,317 @@
+---
+title: 'Skapa en databas från Wordfiler'
+date: '2015-01-22'
+author: LCHansson
+layout: post
+tags: [R, scraping, databases]
+comments: yes
+lang: se
+---
+
+_Detta är den andra artikeln i en serie fristående artiklar som jag skrev i början av 2015 med anledning av en diskussion som uppstått kring Personuppgiftslagen (PUL) och vad som är en "databas" i lagens bemärkelse. Artiklarna är löst tematiskt sammanhållna och behandlar var för sig praktiska, juridiska och programmeringstekniska aspekter av hur man mycket enkelt kan använda en uppsättning Wordfiler som en fullt fungerande databas._
+
+_Läs även gärna de övriga artiklarna i serien:_
+
+1. [PUL och Worddatabaser](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-1/) (juridiska och politiska aspekter)
+2. Använda Wordfiler som en sökbar databas, del 1: Extrahera data (programmering och databearbetning)
+3. Använda Wordfiler som en sökbar databas, del 2: Städa upp i data (kommer inom kort)
+4. Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar? (kommer inom kort)
+
+## Inledning
+
+I denna artikel visar jag hur man, med hjälp av förhållandevis lite programkod, enkelt kan bygga en sökbar databas av en samling halvstrukturerade Worddokument. Till skillnad från den föregående artikeln i denna serie kommer jag här helt att fokusera på själva datahanteringsuppgiften, med hjälp av exempelkod skriven i **R**. Artikeln diskuterar både anatomi och arkitektur för själva dataproblemet.
+
+Den programkod och de Worddokument som används nedan kan laddas hem, i lätt modifierad version, från [det här Github-repot](https://github.com/LCHansson/541_17-exempel). Ladda gärna ned repot, lek runt med koden och berätta hur det gick i kommentarsfältet nedan!
+
+## Data: Några exempeldokument
+
+Den föregående artikeln resonerade kring hur Worddokument med känslig personinformation behandlats i ett aktuellt rättsfall. Låt oss därför använda oss av några Worddokument med sådan information för att se om det snabbt går att bygga en sökbar databas med innehållet från dessa.
+
+Som ett test valde jag att skapa ett mindre antal wordfiler (6st) med "integritetskänslig", om än påhittad, data. Filerna innehåller uppgifter om personalia (alltså personnummer och namn), privatekonomiska förhållanden, brottshistoria och lite annat. Dessutom lade jag in lite slumpmässigt valda rubriker i de olika dokumenten för att emulera en "stökig" databas.
+
+Här är två exempel för att illustrera detta:
+
+*Exempel 1*
+![](/images/2015-01-16-Wordfiler/secrets1.png)
+
+*Exempel 2*
+![](/images/2015-01-16-Wordfiler/secrets2.png)
+
+Den som är intresserad av ytterligare detaljer kan ladda ned samtliga wordfiler från [exempelrepot](https://github.com/LCHansson/541_17-exempel).
+
+Jag skapade även en mappstruktur för att ge ännu lite mer känsla av "äkthet":
+
+![](/images/2015-01-16-Wordfiler/filetree.png)
+
+Det bör dock nämnas att det sistnämnda enbart är kosmetika. Det är nämligen fullkomligt irrelevant i vilken mappstruktur filerna är lagrade. _Det enda viktiga är filernas innehåll och interna struktur_.
+
+
+## Att bygga en scraper
+
+Så nu har vi vår rådata - en mappstruktur med ett antal .docx-filer.
+
+Som jag nämnde ovan är en .docx-fil ingenting annat än en zip-komprimerad mapp med ett antal XML-filer i. Den som är intresserad av att titta närmare på en DOCX-fils innehåll kan öppna den själv i valfritt unzip-program för att få fram mappen. Vill man ha en exakt specifikation över vilka filer som ingår och hur de är strukturerade kan lätt hitta en sådan på internet, t.ex. [här](http://officeopenxml.com/anatomyofOOXML.php), men egentligen är det enda vi behöver känna till detta: allt textinnehåll (som inte ingår i en tabell eller en graf) kan hittas i filen *word/content.xml*.
+
+Eftersom all data vi är intresserade av här lagras i klartext i Worddokumentet, kan hela proceduren för att bygga en databas från Wordfiler sammanfattas som följer:
+
+1. Avrkomprimera varje Wordfil
+2. Gå igenom innehållet i varje fil och lagra resultatet i en array som innehåller data från samtliga filer
+3. Använd någon form av parser för att tolka XML-data till en lista/array
+4. Gå igenom data och säkerställ att det ser ungefär rätt ut
+5. Behåll bara de intressanta bitarna och lagra dem som [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf)
+6. Voila!
+
+För att göra en sådan här process så smidig som bara går vill vi kunna automatisera så mycket som möjligt av ovanstående. Jag gillar personligen att utveckla dataflöden i **R**, och då särskilt med paketen *dplyr* (för bearbetning av tabulär data och functional piping), *stringr* (för text processing) och *rvest* (för XML- och webscraping). Vi behöver även bestämma lite körvariabler.
+
+
+(OBS: Om du är slängd i programering men inte van vid just R, kanske du kommer undra över att jag ofta använder operatorn `%>%` nedan. Detta är `pipe`-operatorn från dplyr-paketet, som används för att skriva funktionskedjor och skriva lättläst/lättutvärderad kod. Den som är intresserad kan läsa mer om dplyr och pipe-operatorn [här](https://www.dropbox.com/sh/i8qnluwmuieicxc/AACsepZJvULCKkbIxK9KP-6Ea/dplyr-tutorial.pdf?dl=0).)
+
+
+
+{% highlight r %}
+## Bibliotek ----
+library("dplyr")
+library("stringr")
+library("rvest")
+library("methods") # This is only needed to enable XML parsing functions in rvest
+
+## Körvariabler ----
+tmp_folder <- "2015-01-16-Wordfiler/unzipped"
+unzipopts <- "-o"
+{% endhighlight %}
+
+
+## Extrahera data från Wordfilerna
+
+Nu när vi satt upp vår programmeringsmiljö kan vi börja läsa in data. Till att börja med ska vi lista alla Wordfiler i vår mappstruktur.
+
+
+{% highlight r %}
+## Extract data from doc ----
+docs <- list.files("2015-01-16-Wordfiler/dokument", recursive = TRUE, full.names = TRUE)
+docs <- gsub(" ", "\\ ", docs, fixed = TRUE)
+print(docs)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+> [1] "2015-01-16-Wordfiler/dokument/Hemliga_personuppgifter.docx"            
+> [2] "2015-01-16-Wordfiler/dokument/Hemligt_dokument.docx"                   
+> [3] "2015-01-16-Wordfiler/dokument/Hemligt_dokument2.docx"                  
+> [4] "2015-01-16-Wordfiler/dokument/skyddad_identitet/Skyddad_identitet.docx"
+> [5] "2015-01-16-Wordfiler/dokument/skyddad_identitet/Skyddad2.docx"         
+> [6] "2015-01-16-Wordfiler/dokument/skyddad_identitet/Skyddad3.docx"
+{% endhighlight %}
+
+I mappstrukturen finns det alltså sex filer. Nästa steg är att unzip:a dessa:
+
+
+{% highlight r %}
+scraped_data <- list()
+
+for (i in 1:length(docs)) {
+  doc <- docs[i]
+  
+  # unzip DOC file
+  paste(getwd(), tmp_folder, i, sep = "/")
+  system2("unzip", paste(unzipopts, doc, "-d", paste(getwd(), tmp_folder, i, sep = "/")))
+  # Debug: uncomment this line to make R report more about what it's doing
+  # system2("pwd", stdout = TRUE)
+}
+{% endhighlight %}
+
+Vi har nu fått en prydlig filstruktur med sex avkomprimerade XML-arkiv:
+
+![](/images/2015-01-16-Wordfiler/unzipped.png)
+
+Efter detta är det bara att läsa in filerna. Men vilka data är det vi letar efter? Allt vi letar efter i de aktuella filerna är rubriker och brödtext lagrat som klartext (och alltså inte i t.ex. tabeller eller metadata), så i detta fall behöver vi bara ta reda på var Word lagrar ett dokuments textinnehåll. En snabb titt på XML-specifikationen för .docx-filer (t.ex. [här](http://officeopenxml.com/anatomyofOOXML.php)) visar att filen vi letar efter heter _word/document.xml_.
+
+När vi väl läst in XML:en behöver vi ta reda på vilken information vi vill ha var och vilken vi kan strunta i. Genom att öppna en av XML-filerna i någon textredigerare ser man ganska snabbt att all text i dokumentet finns lagrad i "<p>"-taggar, och att rubriker dessutom är uppmärkta med "\<ppr\>"-taggar.
+
+Som synes ovan är data i dokumentet lagrad under prydliga rubriker, så vi kan nog förutsätta att den data som lagrats som vanlig text efter en rubrikformaterad rad också tillhör den givna rubriken.
+
+Det finns naturligtvis många metoder för att spara denna data. Scriptet nedan använder en strategi där alla <p>-noder först extraheras till en lista och en vektor sedan skapas med information om vilka listelement som är rubriker. Sedan går scriptet igenom samtliga listelement och tar samtliga element som kommer efter en rubrik och sparar dem som underelement till den rubriken.
+
+
+{% highlight r %}
+for (i in 1:length(docs)) {
+  # Read data from file
+  path <- file.path(getwd(), "2015-01-16-Wordfiler/unzipped", i, "word/document.xml")
+  xdoc <- xml(path)
+  
+  # Get relevant XML nodes ("p")
+  paragraphs <- xdoc %>%
+    xml_node("body") %>%
+    xml_node("body") %>%
+    xml_nodes("p")
+  
+  # Which nodes are headers? ("ppr")
+  is_header <- paragraphs %>% sapply(function(node) {
+    headernodes <- node %>% xml_nodes("ppr")
+    length(headernodes)
+  })
+  
+  dataRows <- list()
+  
+  for (j in 1:length(is_header)) {
+    if (is_header[j] == 1) {
+      ## If the node is a header, store its contents as "header"
+      
+      # Clear data list
+      data <- list()
+      
+      # Get header name
+      header_name <- paragraphs[j] %>%
+        xml_text()
+      
+      # Fix encoding due to random encoding handling in Windows
+      Encoding(header_name) <- "UTF-8"
+      
+      # Debug: uncomment this line to make R report what it's doing
+      # cat("Header name: ", header_name, "\n")
+      
+    } else {
+      ## If the node is not a header, store its contents as list "data"
+      content <- paragraphs[j] %>%
+        xml_nodes("t") %>%
+        xml_text()
+      Encoding(content) <- "UTF-8"
+      
+      # Debug: uncomment this line to make R report what it's doing
+      # cat("Text: ", content, "\n")
+      
+      data <- data %>% append(list(content))
+    }
+    
+    # Save data from last run
+    if (is.na(is_header[j+1])) {
+      dataRows <- dataRows %>% append(list(list(header = header_name, data = data)))
+    } else if (is_header[j+1] == 1) {
+      dataRows <- dataRows %>% append(list(list(header = header_name, data = data)))
+    }
+  }
+  
+  scraped_data <- scraped_data %>% append(list(dataRows))
+}
+{% endhighlight %}
+
+Det vi nu har fått är alltså en hierarkisk lista med alla dataelement ur samtliga dokument vi har gått igenom. Vi har valt att ignorera stora mängder av den information som fanns lagrad i XML-filerna, som olika sorters metadata (t.ex. textformatering), men att extrahera även denna typ av data skulle inte kräva mer än 2-3 rader ytterligare kod.
+
+
+## Transformera till tabellform
+
+Listan vi skapade ovan är såklart mycket användbar, men knappast läsbar för mänskliga ögon. Data är lagrade i en djupt hierarkisk lista ganska ostrukturerade. Så hur gör vi då av vår stökiga data för att kunna använda den till något vettigt?
+
+Även om våra data ser röriga ut så har vi ju faktiskt själva definierat strukturen på dem i koden ovan. Strukturen på datalistan ser ut som följer:
+
+
+{% highlight r %}
+# List structure:
+# [n](doc) >
+#  [n](paragraph) >
+#    header
+#    data >
+#       [n](text)
+{% endhighlight %}
+
+Vår uppgift är alltså att gå igenom denna lista, element för element, och skapa enkla rader av data som vi kan lägga till en eller flera tabeller. Tabeller är generellt mycket lättare att förstå än hierarkiska listor, och liknar dessutom en traditionell relationsdatabas mycket mer.
+
+Så let's do it! Vi börjar med att skapa en tom `data.frame`:
+
+
+{% highlight r %}
+# Create an empty data.frame container
+dokumentdata <- data.frame(
+  docnum = integer(),
+  header = character(),
+  text = character()
+)
+{% endhighlight %}
+
+Sedan går vi igenom hela listan och binder datat till vår nyskapade tabell:
+
+
+{% highlight r %}
+# Loop variables
+docnum <- 0
+row <- 0
+
+# Loop through all the documents
+for (doc in scraped_data) {
+  # What document are we looking at?
+  docnum <- docnum + 1
+  
+  # Loop through each paragraph in the document
+  for (par in doc) {
+    # Header element
+    header <- par$header
+    
+    # Loop through all "data" elements related to a certain header
+    for (text in par$data) {
+      if (length(text) == 0) {
+        # If there are no data elements under a given header, don't attempt to store it.
+        
+        # Debug: uncomment this line to make R report what it's doing
+        # cat("No text; passing\n")
+        next()
+      }
+      
+      # If there were several text elements, coerce them into a single character string
+      text <- paste(text, collapse = "")
+      
+      # Create a row to bind to the data.frame
+      datarow <- list(docnum = docnum, header = header, text = text)
+      
+      # Debug: uncomment the following lines to make R report what it's doing
+      # row <- row + 1
+      # cat(paste0(row, ": docnum: ", docnum, "; header: ", header, "; text: ", text), "\n")
+      
+      # Bind the data row to the data.frame
+      dokumentdata <- bind_rows(dokumentdata, as_data_frame(datarow))
+    }
+  }
+}
+{% endhighlight %}
+
+Vi har nu lagrat allt vårt data i tabellform. Det borde betyda att vi äntligen kan ta en titt på hur det ser ut:
+
+
+{% highlight r %}
+print(dokumentdata, n = 20)
+{% endhighlight %}
+
+
+
+{% highlight text %}
+> Source: local data frame [62 x 3]
+> 
+>    docnum           header                                                   text
+> 1       1  Personuppgifter                                          Lite brödtext
+> 2       1       Personalia                                  Personnr: 234568-9843
+> 3       1       Personalia                                  Namn: Sven Svenljunga
+> 4       1         Brottmål                                  Mål 471-546 (frikänd)
+> 5       1         Brottmål Kommentar om att personen aldrig varit dömd i brottmål
+> 6       1          Ekonomi                            Årsinkomst 2013: 300 000 kr
+> 7       1          Ekonomi                                 Inkomst 2012 – 250 000
+> 8       1          Ekonomi                     Fem ärenden hos inkasso under 2012
+> 9       1           Övrigt                                            Bla bla bla
+> 10      2 Hemligt dokument                                          Lite brödtext
+> 11      2       Personalia                                  Personnr: 123456-7890
+> 12      2       Personalia                                    Namn: Namn Namnsson
+> 13      2         Brottmål                                             Mål 123-65
+> 14      2         Brottmål        Kommentar om att personen varit dömd i brottmål
+> 15      2          Ekonomi                            Årsinkomst 2013: 514 000 kr
+> 16      2          Ekonomi                                       2012: 123 000 kr
+> 17      2          Ekonomi                                    Skulder: 141 000 kr
+> 18      2          Ekonomi      Kronofogden: 3st betalningsanmärkningar 2011-2012
+> 19      2           Övrigt                                              Blablabla
+> 20      3 Hemligt dokument                                          Lite brödtext
+> ..    ...              ...                                                    ...
+{% endhighlight %}
+
+Nu börjar det likna något! Det här ser ju nästan ut som en riktig databas. Och allt vi hittills gjort är egentligen bara att unzip:a alla Wordfiler och bygga ett script som parsar lite XML-data och stuvar om den till en tabell. Vem sade att det inte var enkelt att bygga en databas från Worddokument?!
+
+Det är nog värt att understryka att _vi redan nu är färdiga med att bygga en sökbar databas från våra Wordfiler_. Databasen har till och med en nyckel, `docnum`, vilket ju i detta fall indirekt även blir en personnyckel eftersom lagringsprincipen i detta fall är "en person - ett dokument".
+
+Men det betyder självklart inte att det är _lätt_ att söka i databasen. All relevant data finns ju lagrad i `text`-kolumnen, och den är ganska stökig. I nästa artikel ska vi därför titta på hur vi kan göra för att städa upp i stökig textdata och skapa en riktig relationsdatabas för personuppgifter.
