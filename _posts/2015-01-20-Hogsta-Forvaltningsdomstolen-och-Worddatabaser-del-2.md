@@ -1,6 +1,6 @@
 ---
 title: 'Att skapa en databas från Wordfiler: Läsa in data'
-date: '2015-01-22'
+date: '2015-01-21'
 author: LCHansson
 layout: post
 tags: [R, scraping, databases]
