@@ -342,17 +342,6 @@ Som ett andra exempel, låt oss anta att vi vill göra en scatter plot över rel
 
 {% highlight r %}
 library("ggplot2")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Loading required package: methods
-{% endhighlight %}
-
-
-
-{% highlight r %}
 library("scales")
 persondatabas %>%
   group_by(docnum, namn, personnr) %>%

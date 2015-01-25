@@ -227,7 +227,7 @@ Vildsvin Vildsvinsdotter är alltså den person med den högsta inkomsten i data
 
 Som ett andra exempel, låt oss anta att vi vill göra en scatter plot över relationen mellan inkomst och hur många brottmål man varit inblandad i. I detta fall använder vi oss av genomsnittet av personernas kända årsinkomster istället. 
 
-```{r, fig.width=10}
+```{r, fig.width=10, message=FALSE}
 library("ggplot2")
 library("scales")
 persondatabas %>%
@@ -243,6 +243,7 @@ persondatabas %>%
   labs(title = "Medelinkomst vs inblandning i brottmål (fiktiva data)", x = "Medelinkomst", y = "Antal brottmål 2010-2014") +
   scale_color_brewer(palette = "Set1") +
   scale_x_continuous(labels = comma)
+
 ```
 
 Så de med lägst _och_ högst inkomster i databasen är alltså de som varit inblandade i flest brottmål. Intressant!
