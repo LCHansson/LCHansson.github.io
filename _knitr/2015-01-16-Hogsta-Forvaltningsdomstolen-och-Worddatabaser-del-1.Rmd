@@ -13,8 +13,8 @@ _Detta är den första artikeln i en serie fristående artiklar som jag skrev i 
 _Läs även gärna de övriga artiklarna i serien:_
 
 1. PUL och Worddatabaser (juridiska och politiska aspekter)
-2. [Hur man skapar en databas från Wordfiler](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (programmering och databearbetning)
-3. Använda Wordfiler som en sökbar databas, del 2: Skapa ordning i datakaoset (kommer inom kort)
+2. [Hur man skapar en databas från Wordfiler](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (programmering och datainläsning)
+3. [Använda Wordfiler som en sökbar databas, del 2: Städa upp i data](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (databearbetning)
 4. Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar? (kommer inom kort)
 
 

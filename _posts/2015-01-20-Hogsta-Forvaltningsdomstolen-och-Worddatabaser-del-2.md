@@ -1,5 +1,5 @@
 ---
-title: 'Hur man skapar en databas från Wordfiler'
+title: 'Att skapa en databas från Wordfiler: Läsa in data'
 date: '2015-01-22'
 author: LCHansson
 layout: post
@@ -13,8 +13,8 @@ _Detta är den andra artikeln i en serie fristående artiklar som jag skrev i b�
 _Läs även gärna de övriga artiklarna i serien:_
 
 1. [PUL och Worddatabaser](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-1/) (juridiska och politiska aspekter)
-2. Hur man skapar en databas från Wordfiler (programmering och databearbetning)
-3. Använda Wordfiler som en sökbar databas, del 2: Städa upp i data (kommer inom kort)
+2. Hur man skapar en databas från Wordfiler (programmering och datainläsning)
+3. [Använda Wordfiler som en sökbar databas, del 2: Städa upp i data](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (databearbetning)
 4. Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar? (kommer inom kort)
 
 ## Inledning
@@ -62,8 +62,8 @@ Eftersom all data vi är intresserade av här lagras i klartext i Worddokumentet
 1. Avrkomprimera varje Wordfil
 2. Gå igenom innehållet i varje fil och lagra resultatet i en array som innehåller data från samtliga filer
 3. Använd någon form av parser för att tolka XML-data till en lista/array
-4. Gå igenom data och säkerställ att det ser ungefär rätt ut
-5. Behåll bara de intressanta bitarna och lagra dem som [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf)
+4. Säkerställ att data ser ungefär rätt ut och lagra den som [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf)
+5. Välj ut de data som är intressanta och spara dem i relationstabeller
 6. Voila!
 
 För att göra en sådan här process så smidig som bara går vill vi kunna automatisera så mycket som möjligt av ovanstående. Jag gillar personligen att utveckla dataflöden i **R**, och då särskilt med paketen *dplyr* (för bearbetning av tabulär data och functional piping), *stringr* (för text processing) och *rvest* (för XML- och webscraping). Vi behöver även bestämma lite körvariabler.
