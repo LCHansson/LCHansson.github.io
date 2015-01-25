@@ -8,6 +8,9 @@ comments: yes
 lang: se
 ---
 
+
+
+
 _Detta är den tredje artikeln i en serie fristående artiklar som jag skrev i början av 2015 med anledning av en diskussion som uppstått kring Personuppgiftslagen (PUL) och vad som är en "databas" i lagens bemärkelse. Artiklarna är löst tematiskt sammanhållna och behandlar var för sig praktiska, juridiska och programmeringstekniska aspekter av hur man mycket enkelt kan använda en uppsättning Wordfiler som en fullt fungerande databas._
 
 _Läs även gärna de övriga artiklarna i serien:_
@@ -37,7 +40,40 @@ by(dokumentdata, dokumentdata$docnum, FUN = function(x) unique(x$header))
 
 
 {% highlight text %}
-> Error in by(dokumentdata, dokumentdata$docnum, FUN = function(x) unique(x$header)): object 'dokumentdata' not found
+> dokumentdata$docnum: 1
+> [1] "Personuppgifter" "Personalia"      "Brottmål"        "Ekonomi"        
+> [5] "Övrigt"         
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 2
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 3
+> [1] "Hemligt dokument" "Personalia"       "Brottmål"         "Ekonomi"         
+> [5] "Övrigt"          
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 4
+> [1] "Hemliga uppgifter för person med skyddad identitet"
+> [2] "Personalia"                                        
+> [3] "Brottmål"                                          
+> [4] "Årsinkomster"                                      
+> [5] "Skulder"                                           
+> [6] "Övrigt"                                            
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 5
+> [1] "Personuppgifter, person med skyddad identitet"
+> [2] "Personalia"                                   
+> [3] "Brottmål"                                     
+> [4] "Ekonomi"                                      
+> [5] "Övrigt"                                       
+> ------------------------------------------------------------------- 
+> dokumentdata$docnum: 6
+> [1] "Loremipsumdolorsitamet, consecteturadipiscing elit, sed do eiusmodtemporincididunt ut labore et doloremagnaaliqua. Ut enim ad minimveniam, quisnostrudexercitationullamcolaborisnisi ut aliquip ex eacommodoconsequat. Duisauteiruredolor in reprehenderit in voluptatevelit esse cillumdolore eu fugiatnulla pariatur. Excepteur sint occaecatcupidatat non proident, sunt in culpa quiofficiadeseruntmollitanim id est laborum"
+> [2] "Personalia"                                                                                                                                                                                                                                                                                                                                                                                                                      
+> [3] "Bolagsengagemang"                                                                                                                                                                                                                                                                                                                                                                                                                
+> [4] "Ekonomi"                                                                                                                                                                                                                                                                                                                                                                                                                         
+> [5] "Brottmål"                                                                                                                                                                                                                                                                                                                                                                                                                        
+> [6] "Övrigt"
 {% endhighlight %}
 
 Det finns en del udda data här. Men en gemensam nämnare för nästan samtliga dokument är att de innehåller rubrikerna "Personalia", "Ekonomi", "Brottmål" och "Övrigt". Ett av dokumenten, nr. 4, tycks dock ha ersatt "Ekonomi" med rubrikerna "Årsinkomster" och "Skulder". Men det är inget vi inte kan åtgärda!
@@ -57,24 +93,29 @@ Vi börjar med den lättaste kategorin - personalia. Först plockar vi ut enbart
 personalia_raw <- dokumentdata %>%
   filter(header == "Personalia") %>%
   group_by(docnum)
-{% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 print(personalia_raw, n = 12)
 {% endhighlight %}
 
 
 
 {% highlight text %}
-> Error in print(personalia_raw, n = 12): object 'personalia_raw' not found
+> Source: local data frame [12 x 3]
+> Groups: docnum
+> 
+>    docnum     header                            text
+> 1       1 Personalia           Personnr: 234568-9843
+> 2       1 Personalia           Namn: Sven Svenljunga
+> 3       2 Personalia           Personnr: 123456-7890
+> 4       2 Personalia             Namn: Namn Namnsson
+> 5       3 Personalia           Personnr: 214365-8709
+> 6       3 Personalia       Namn: Charlie Charlieberg
+> 7       4 Personalia           Personnr: 661122-0033
+> 8       4 Personalia Namn: Svinlaug S. Svinlaugsbäck
+> 9       5 Personalia           Personnr: 123456-7890
+> 10      5 Personalia               Namn:Anka Anksson
+> 11      6 Personalia           Personnr: 123456-7890
+> 12      6 Personalia  Namn: Vildsvin Vildsvinsdotter
 {% endhighlight %}
 
 Personalia tycks vara ganska enhetligt strukturerade. Rader med namn tycks ofta (alltid?) inledas med texten "Namn:", och personnummer följer alltid formatet YYMMDD-XXXX. Vi kan därför extrahera `namn` och `personnr` med hjälp av ytterligare filtrering och perl-liknande reguljära uttryck genom att söka efter de mönster jag beskrev ovan:
@@ -90,28 +131,12 @@ namn <- personalia_raw %>%
       str_trim()
   ) %>%
   select(docnum, namn)
-{% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 personnr <- personalia_raw %>%
   filter(str_detect(text, "\\d{6}-\\d{4}" %>% perl())) %>%
   # Extract strings on the form DDDDDD-DDDD
   mutate(personnr = str_extract_all(text, "\\d{6}-\\d{4}" %>% perl())[[1]]) %>%
   select(docnum, personnr)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
 {% endhighlight %}
 
 Vi kan nu upprepa denna procedur för alla uppgifter vi är intresserade av.
@@ -128,24 +153,33 @@ Precis som ovan börjar vi med att extrahera all ekonomidata och titta närmare 
 ekonomi_raw <- dokumentdata %>%
   filter(header == "Ekonomi" | header == "Årsinkomster") %>%
   group_by(docnum)
-{% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 ekonomi_raw$text
 {% endhighlight %}
 
 
 
 {% highlight text %}
-> Error in eval(expr, envir, enclos): object 'ekonomi_raw' not found
+>  [1] "Årsinkomst 2013: 300 000 kr"                                                               
+>  [2] "Inkomst 2012 – 250 000"                                                                    
+>  [3] "Fem ärenden hos inkasso under 2012"                                                        
+>  [4] "Årsinkomst 2013: 514 000 kr"                                                               
+>  [5] "2012: 123 000 kr"                                                                          
+>  [6] "Skulder: 141 000 kr"                                                                       
+>  [7] "Kronofogden: 3st betalningsanmärkningar 2011-2012"                                         
+>  [8] "Årsinkomst 2013: 45 000:-"                                                                 
+>  [9] "2011 tjänade personen 537019 kr"                                                           
+> [10] "Inga skulder"                                                                              
+> [11] "Kronofogden: inga anmärkningar"                                                            
+> [12] "2013: 450 000"                                                                             
+> [13] "2012: 420 000"                                                                             
+> [14] "2011: 415 000"                                                                             
+> [15] "2010: 360 000"                                                                             
+> [16] "2009: 300 000"                                                                             
+> [17] "Årsinkomst: 220 000 (2010), 230 000 (2011), 231 456 (2012), 240 071 (2013), 260 765 (2014)"
+> [18] "Inga skulder. Kreditvärdighet 8,5 av 10."                                                  
+> [19] "Årsinkomst 2014: 514 100 kr"                                                               
+> [20] "Vildsvin är helt skuldfri"
 {% endhighlight %}
 
 Vi kan notera fyra saker om vårt data:
@@ -168,70 +202,21 @@ inkomster <- ekonomi_raw %>%
   )
 {% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
 Vi fortsätter sedan med att separera inkomstuppgifter för dokument nr 5 och sedan lägga till dem till vårt nyskapade dataset.
 
 
 {% highlight r %}
 # Separate the single row for document 5 into five separate rows
 ink5 <- ekonomi_raw$text[ekonomi_raw$docnum == 5][[1]]
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): object 'ekonomi_raw' not found
-{% endhighlight %}
-
-
-
-{% highlight r %}
 yrs <- str_extract_all(ink5, "(?<=\\()\\d{4}(?=\\))" %>% perl())[[1]]
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "str_extract_all"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 ink <- str_extract_all(ink5, "\\d{2,3}(\\s)?\\d{3}" %>% perl())[[1]]
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "str_extract_all"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 inkomster_5 <- data_frame(
   docnum = 5,
   ar = yrs,
   inkomst = ink,
   header = "Ekonomi"
 )
-{% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "data_frame"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 # Replace data for document 5 with the munged data
 # and convert the string "XXX XXX" into an integer
 inkomster <- inkomster %>%
@@ -239,12 +224,6 @@ inkomster <- inkomster %>%
   bind_rows(inkomster_5) %>%
   select(-text, -header) %>%
   mutate(inkomst = inkomst %>% str_replace_all("[[:blank:]]", "") %>% as.integer())
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
 {% endhighlight %}
 
 #### Brottmål
@@ -257,24 +236,27 @@ Vi upprepar proceduren för brottmålsinblandning:
 brottmal_raw <- dokumentdata %>%
   filter(header == "Brottmål") %>%
   group_by(docnum)
-{% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
-
-
-{% highlight r %}
 brottmal_raw$text
 {% endhighlight %}
 
 
 
 {% highlight text %}
-> Error in eval(expr, envir, enclos): object 'brottmal_raw' not found
+>  [1] "Mål 471-546 (frikänd)"                                                                                                                                                                                                                                                                                                                                                                                                                                  
+>  [2] "Kommentar om att personen aldrig varit dömd i brottmål"                                                                                                                                                                                                                                                                                                                                                                                                 
+>  [3] "Mål 123-65"                                                                                                                                                                                                                                                                                                                                                                                                                                             
+>  [4] "Kommentar om att personen varit dömd i brottmål"                                                                                                                                                                                                                                                                                                                                                                                                        
+>  [5] "Mål 555-55"                                                                                                                                                                                                                                                                                                                                                                                                                                             
+>  [6] "Kommentar om att personen varit dömd i brottmål"                                                                                                                                                                                                                                                                                                                                                                                                        
+>  [7] "Inga brottmål"                                                                                                                                                                                                                                                                                                                                                                                                                                          
+>  [8] "Kommentar: Svinlaug är helt straffri."                                                                                                                                                                                                                                                                                                                                                                                                                  
+>  [9] "Mål 632-632: Åtalad för snatteri men frikänd"                                                                                                                                                                                                                                                                                                                                                                                                           
+> [10] "Mål 871-192: Åtalad för uppseendeväckande beteende men frikänd"                                                                                                                                                                                                                                                                                                                                                                                         
+> [11] "Mål 736-928: Dömd för grov stöld till dagsböter och 2 månaders villkorlig dom."                                                                                                                                                                                                                                                                                                                                                                         
+> [12] "Loremipsumdolorsitamet, consecteturadipiscing elit, sed do eiusmodtemporincididunt ut labore et doloremagnaaliqua. Hovrättsmål987-654aliqua. Excepteur sint occaecatcupidatat non proident, sunt in culpa quiofficiadeseruntmollitanim id est laborum"                                                                                                                                                                                                  
+> [13] "Loremipsumdolorsitamet, consecteturadipiscing elit, sed do eiusmodtemporincididunt ut labore et doloremagnaaliqua. Ut enim ad minimveniam, quisnostrudexercitationullamcolaborisnisi ut aliquip ex eacommodoconsequat.Duisauteiruredolor in reprehenderit in voluptatevelit esse cillumdolore eu fugiatnulla pariatur. Excepteur sint occaecatcupidatat non proident, sunt in culpa quiofficiadeseruntmollitanim id est laborummål 123-456 i hovrätten."
+> [14] "Kommentar om att personen är straffri."
 {% endhighlight %}
 
 Det här datat har helt klart en hel del brödtext i sig. Denna hade kunnat vara intressant i något annat sammanhang men just nu är vi som sagt bara intresserade av att veta vilka brottmål personerna varit inblandade i.
@@ -290,12 +272,6 @@ brottmal <- brottmal_raw %>%
   select(docnum, inblandad_i_mal)
 {% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
 #### Kommentarer
 
 Slutligen extraherar vi också all text som finns lagrad under "Övrigt" i dokumenten, mest för att visa att vi kan:
@@ -305,12 +281,6 @@ Slutligen extraherar vi också all text som finns lagrad under "Övrigt" i dokum
 ovrigt <- dokumentdata %>%
   filter(header == "Övrigt") %>%
   select(docnum, kommentar = text)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
 {% endhighlight %}
 
 ## Sammanställning av samtliga data till en databas
@@ -325,12 +295,6 @@ persondatabas <- namn %>%
   left_join(ovrigt, by = "docnum")
 {% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
-
 För att se uppgifter om ekonomi eller brottmålsinblandning får vi lägga till dessa också, men om vi gör detta tappar vi principen "ett dokument, en rad". Nedan ger jag ändå ett exempel på hur man kan göra om man vill följa principen om att lagra _alla_ data i ett och samma dataset.
 
 
@@ -339,12 +303,6 @@ För att se uppgifter om ekonomi eller brottmålsinblandning får vi lägga till
 persondatabas_stor <- persondatabas %>%
   left_join(inkomster, by = "docnum") %>%
   left_join(brottmal, by = "docnum")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
 {% endhighlight %}
 
 
@@ -369,7 +327,12 @@ persondatabas %>%
 
 
 {% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
+> Source: local data frame [3 x 5]
+> 
+>   docnum                     namn    personnr   ar inkomst
+> 1      3      Charlie Charlieberg 214365-8709 2013   45000
+> 2      6 Vildsvin Vildsvinsdotter 123456-7890 2014  514100
+> 3      6 Vildsvin Vildsvinsdotter 123456-7890 2014  514100
 {% endhighlight %}
 
 Vildsvin Vildsvinsdotter är alltså den person med den högsta inkomsten i databasen, och Charlie Charlieberg är den med lägst inkomst.
@@ -406,11 +369,7 @@ persondatabas %>%
   scale_x_continuous(labels = comma)
 {% endhighlight %}
 
-
-
-{% highlight text %}
-> Error in eval(expr, envir, enclos): could not find function "%>%"
-{% endhighlight %}
+![center](/../fig/2015-01-21-Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-3/unnamed-chunk-13-1.png) 
 
 Så de med lägst _och_ högst inkomster i databasen är alltså de som varit inblandade i flest brottmål. Intressant!
 

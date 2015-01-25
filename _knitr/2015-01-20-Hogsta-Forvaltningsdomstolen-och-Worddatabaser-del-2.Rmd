@@ -276,3 +276,9 @@ Nu börjar det likna något! Det här ser ju nästan ut som en riktig databas. O
 Det är nog värt att understryka att _vi redan nu är färdiga med att bygga en sökbar databas från våra Wordfiler_. Databasen har till och med en nyckel, `docnum`, vilket ju i detta fall indirekt även blir en personnyckel eftersom lagringsprincipen i detta fall är "en person - ett dokument".
 
 Men det betyder självklart inte att det är _lätt_ att söka i databasen. All relevant data finns ju lagrad i `text`-kolumnen, och den är ganska stökig. I nästa artikel ska vi därför titta på hur vi kan göra för att städa upp i stökig textdata och skapa en riktig relationsdatabas för personuppgifter.
+
+
+```{r, echo=FALSE, results='hide'}
+save(dokumentdata, file = "dokumentdata.RData")
+```
+

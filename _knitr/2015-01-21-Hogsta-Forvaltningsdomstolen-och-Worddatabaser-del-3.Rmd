@@ -8,6 +8,14 @@ comments: yes
 lang: se
 ---
 
+```{r, echo=FALSE, results='hide', message=FALSE}
+library("dplyr")
+library("rvest")
+library("stringr")
+load("dokumentdata.RData")
+```
+
+
 _Detta är den tredje artikeln i en serie fristående artiklar som jag skrev i början av 2015 med anledning av en diskussion som uppstått kring Personuppgiftslagen (PUL) och vad som är en "databas" i lagens bemärkelse. Artiklarna är löst tematiskt sammanhållna och behandlar var för sig praktiska, juridiska och programmeringstekniska aspekter av hur man mycket enkelt kan använda en uppsättning Wordfiler som en fullt fungerande databas._
 
 _Läs även gärna de övriga artiklarna i serien:_
