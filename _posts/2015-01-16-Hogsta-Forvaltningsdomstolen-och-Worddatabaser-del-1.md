@@ -14,7 +14,7 @@ _Läs även gärna de övriga artiklarna i serien:_
 
 1. PUL och Worddatabaser (juridiska och politiska aspekter)
 2. [Att skapa en databas från Wordfiler: Läsa in data](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (programmering och datainläsning)
-3. [Att skapa en databas från Wordfiler: städa upp i databasen](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-2/) (databearbetning)
+3. [Att skapa en databas från Wordfiler: städa upp i databasen](http://lchansson.com/blog/2015/01/Hogsta-Forvaltningsdomstolen-och-Worddatabaser-del-1/) (databearbetning)
 4. Efterord: Liberal tolkning av PUL och bristande teknisk kunskap hos svenska domstolar? (kommer inom kort)
 
 
