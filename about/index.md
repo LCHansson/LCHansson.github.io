@@ -20,7 +20,7 @@ I'm always open to new interesting projects and opportunities. If you want to wo
 
 ### CV
 
-If you're interested in my contributions to the open source community, see my [Open Source Report Card][OSScv] over at dfm.io.
+Most of the development work I've done is on [Github][Github].
 
 For a slightly more serious approach, see my [LinkedIn page][LinkedIn].
 
@@ -32,3 +32,4 @@ For a slightly more serious approach, see my [LinkedIn page][LinkedIn].
 [Email]: mailto:love.hansson@gmail.com
 [OSScv]: https://osrc.dfm.io/lchansson/
 [LinkedIn]: http://linkedin.com/in/lovehansson
+[Github]: https://github.com/lchansson
