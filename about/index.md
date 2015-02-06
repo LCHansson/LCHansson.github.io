@@ -6,7 +6,7 @@ modified: 2014-10-26
 comments: true
 ---
 
-I'm Love Hansson: Analyst, stats junkie, amateur hacker. I'm all about data driven development, be it for purposes of analytics, art, or communication. Currently working as a data analyst at the [Swedish Pensions Agency][PMy].
+I'm Love Hansson: Analyst, stats hacker, amateur designer. I'm all about data driven development, be it for purposes of analytics, art, or communication. Currently working as a data analyst at the [Swedish Pensions Agency][PMy].
 
 ### Projects
 
@@ -24,8 +24,6 @@ If you're interested inmy contributions to the open source community, see my [Op
 
 For a slightly more serious approach, see my [LinkedIn page][LinkedIn].
 
-If you're really interested in all the gory details (why on Earth would you be that?), you can of course download a PDF with my full resume (currently only in Swedish) [here][CVdl].
-
 
 
 [PMy]: https://secure.pensionsmyndigheten.se
@@ -34,4 +32,3 @@ If you're really interested in all the gory details (why on Earth would you be t
 [Email]: mailto:love.hansson@gmail.com
 [OSScv]: https://osrc.dfm.io/lchansson/
 [LinkedIn]: http://linkedin.com/in/lovehansson
-[CVdl]: https://dl.dropboxusercontent.com/u/18122393/CV_Love_Hansson_sv.pdf
