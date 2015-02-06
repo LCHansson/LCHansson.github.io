@@ -38,13 +38,6 @@ Braceana is a lightweight, markdown-based CMS geared towards quick and easy stat
 I'm a co-founder, former board member, and active participant of [SRUG][srug]. <br/>[[talk][srugtalks]]
 
 
-### iPlot
-
-iPlot is (or perhaps rather, _was_) a R/Shiny based, interactive, browser-based application for visual inspection of data that I developed wtogether with colleague [@reinholdsson](https://github.com/reinholdsson). It was never developed any further than into the prototype stage, but is a working showcase example of how Shiny can be used for quick-and-dirty prototyping when developing analytics tools.
-
-iPlot was based on an old version of the Shiny API and has thus since stopped lookin as beautiful as we first intended it to, but it you're sincerely interested you can still find links to the code (including screenshots!) and a half-working demo below.
-<br/>[[source code][iPlot_source]; [example application][iPlot_example]]
-
 
 [shiny]: http://shiny.rstudio.com
 [braceana-gh]: https://github.com/LCHansson/braceana
