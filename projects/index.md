@@ -6,20 +6,10 @@ modified: 2015-02-06
 excerpt: "Selected works"
 ---
 
-<!--
-<section id="table-of-contents" class="toc">
-  <header>
-    <h3>Overview</h3>
-  </header>
-<div id="drawer" markdown="1">
-*  Auto generated table of contents
-{:toc}
-</div>
-</section><!-- /#table-of-contents -->
 
-### Mellokollen
+<h3 class="pull-up"> Mellokollen </h3>
 
-[Mellokollen.se][mellokollen] is a site I developed together with [@cperriard](https://github.com/cperriard) and [@luminita](https://github.com/cperriard) with design by [@hisekaldma](http://twitter.com/hisekaldma). It's a visualization/data journalism site about Melodifestivalen, the vastly popular annual music festival which also serves as the qualification competition for the Eurovision Song Contest. <br/> [[website][mellokollen]; [open data][mellodata]]
+[Mellokollen.se][mellokollen] is a site I developed together with [@cperriard](https://github.com/cperriard) and [@luminita](https://github.com/luminita) with design by [@hisekaldma](http://twitter.com/hisekaldma). It's a visualization/data journalism site about Melodifestivalen, the vastly popular annual music festival which also serves as the qualification competition for the Eurovision Song Contest. <br/> [[website][mellokollen]; [open data][mellodata]]
 
 ### Kvartersregeringen / Hack for Sweden
 
