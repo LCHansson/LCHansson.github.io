@@ -599,16 +599,16 @@ $button-size: 1.5rem;
 	@include clearfix;
 	clear: both;
 	padding-bottom: 3em;
-	a,
-	a:active,
-	a:visited,
+//	a,
+//	a:active,
+//	a:visited,
 	p,
 	h4,
 	h5,
 	h6,
 	span { 
-		@include font-rem(14);
-    color: grey;
+      @include font-rem(14);
+      color: grey;
 	}
 	footer {
 		@include grid(12,10);
