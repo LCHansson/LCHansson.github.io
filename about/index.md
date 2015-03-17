@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: about
 title: About LCHansson
 tags: [about]
 modified: 2014-10-26
