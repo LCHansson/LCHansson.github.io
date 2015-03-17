@@ -12,4 +12,18 @@
 </div><!-- /.google-ads -->
 {% endif %}
 
-<span>&copy; {{ site.time | date: '%Y' }} {{ site.owner.name }}. All content licensed under (<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA</a>) unless otherwise stated. Powered by <a href="http://jekyllrb.com">Jekyll</a> using the <a href="http://mademistakes.com/minimal-mistakes/">Minimal Mistakes</a> theme.</span>
+<div class="bottom-buttons">
+    <ul>
+        {% if author.email %}<li><a href="mailto:{{ author.email }}" class="author-social" target="_blank"><i class="fa fa-fw fa-envelope-square"></i> Email</a></li>{% endif %}
+        {% if author.twitter %}<li><a href="http://twitter.com/{{ author.twitter }}" class="author-social" target="_blank"><i class="fa fa-fw fa-twitter-square"></i> Twitter</a></li>{% endif %}
+        {% if author.facebook %}<li><a href="http://facebook.com/{{ author.facebook }}" class="author-social" target="_blank"><i class="fa fa-fw fa-facebook-square"></i> Facebook</a></li>{% endif %}
+        {% if author.google.plus %}<li><a href="http://plus.google.com/+{{ author.google.plus }}" class="author-social" target="_blank"><i class="fa fa-fw fa-google-plus-square"></i> Google+</a></li>{% endif %}
+        {% if author.linkedin %}<li><a href="http://linkedin.com/in/{{ author.linkedin }}" class="author-social" target="_blank"><i class="fa fa-fw fa-linkedin-square"></i> LinkedIn</a></li>{% endif %}
+        {% if author.instagram %}<li><a href="http://instagram.com/{{ author.instagram }}" class="author-social" target="_blank"><i class="fa fa-fw fa-instagram"></i> Instagram</a></li>{% endif %}
+        {% if author.tumblr %}<li><a href="http://{{ author.tumblr }}.tumblr.com" class="author-social" target="_blank"><i class="fa fa-fw fa-tumblr-square"></i> Tumblr</a></li>{% endif %}
+        {% if author.github %}<li><a href="http://github.com/{{ author.github }}" class="author-social" target="_blank"><i class="fa fa-fw fa-github"></i> Github</a></li>{% endif %}
+        {% if author.stackoverflow %}<li><a href="http://stackoverflow.com/users/{{ author.stackoverflow }}" class="author-social" target="_blank"><i class="fa fa-fw fa-stack-overflow"></i> Stackoverflow</a></li>{% endif %}
+    </ul>
+</div>
+
+<span id="footer-copy">&copy; {{ site.time | date: '%Y' }} {{ site.owner.name }}. All content licensed under (<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA</a>) unless otherwise stated. Powered by <a href="http://jekyllrb.com">Jekyll</a> using the <a href="http://mademistakes.com/minimal-mistakes/">Minimal Mistakes</a> theme.</span>
