@@ -3,14 +3,14 @@
 #- title: Home
 #  url: /
 
-- title: About me
+- title: About
   url: /about/
 
-- title: Projects and Portfolio
+- title: Portfolio
   url: /projects/
 
 - title: Blog
   url: /blog/
 
-- title: Find me on Github
-  url: http://github.com/LCHansson
+#- title: Find me on Github
+#  url: http://github.com/LCHansson
