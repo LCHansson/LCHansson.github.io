@@ -3,7 +3,7 @@ $doc-font-size: 16;
 $doc-line-height: 26;
 $paragraph-indent: true !default;
 $base-font: 'PT Serif', serif;
-$heading-font: 'PT Sans Narrow', sans-serif;
+$heading-font: 'Crimson Text', sans-serif;
 $code-font: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
 $alt-font: $base-font;
 
@@ -13,7 +13,7 @@ $body-color     : $bodycolor;
 $textcolor      : #333332;
 $text-color     : $textcolor;
 $border-color   : $text-color;
-$basecolor 		  : #343434;	  
+$basecolor 		  : #343434;
 $compcolor 		  : spin($basecolor, 180); 
 $bordercolor    : $basecolor;
 $white          : #fff;
