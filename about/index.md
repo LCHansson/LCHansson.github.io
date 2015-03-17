@@ -3,7 +3,7 @@ layout: page
 title: About LCHansson
 tags: [about]
 modified: 2014-10-26
-comments: true
+comments: false
 ---
 
 I'm Love Hansson: Analyst, stats hacker, amateur designer. I'm all about data driven development, be it for purposes of analytics, art, or communication. Currently working as a data analyst at the [Swedish Pensions Agency][PMy].
